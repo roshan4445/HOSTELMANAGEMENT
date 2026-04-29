@@ -13,7 +13,7 @@ const PublicView = () => {
   useEffect(() => {
     const fetchPublicRooms = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/rooms/public/${pgName}`);
+        const { data } = await axios.get(`https://hostelmanagement-rss4.onrender.com/api/rooms/public/${pgName}`);
         setRooms(data.rooms);
         setActualPgName(data.pgName);
         setLoading(false);

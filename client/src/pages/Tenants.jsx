@@ -41,9 +41,9 @@ const Tenants = () => {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const [tenantsRes, roomsRes, paymentsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/tenants', config),
-        axios.get('http://localhost:5000/api/rooms', config),
-        axios.get('http://localhost:5000/api/payments', config)
+        axios.get('https://hostelmanagement-rss4.onrender.com/api/tenants', config),
+        axios.get('https://hostelmanagement-rss4.onrender.com/api/rooms', config),
+        axios.get('https://hostelmanagement-rss4.onrender.com/api/payments', config)
       ]);
       setTenants(tenantsRes.data);
       setRooms(roomsRes.data.filter(r => r.status !== 'Occupied'));
@@ -64,7 +64,7 @@ const Tenants = () => {
     try {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('http://localhost:5000/api/tenants', formData, config);
+      await axios.post('https://hostelmanagement-rss4.onrender.com/api/tenants', formData, config);
       toast.success('Tenant added successfully!');
       setShowModal(false);
       fetchData();
@@ -94,7 +94,7 @@ const Tenants = () => {
     try {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post(`http://localhost:5000/api/tenants/${noticeTenantId}/notice`, { moveOutDate: noticeDate }, config);
+      await axios.post(`https://hostelmanagement-rss4.onrender.com/api/tenants/${noticeTenantId}/notice`, { moveOutDate: noticeDate }, config);
       toast.success('Notice submitted successfully!');
       setShowNoticeModal(false);
       setNoticeTenantId(null);
@@ -123,7 +123,7 @@ const Tenants = () => {
               try {
                 const token = JSON.parse(localStorage.getItem('userInfo')).token;
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                await axios.put(`http://localhost:5000/api/tenants/${tenantId}/moveout`, {}, config);
+                await axios.put(`https://hostelmanagement-rss4.onrender.com/api/tenants/${tenantId}/moveout`, {}, config);
                 toast.success('Tenant moved out successfully!');
                 fetchData();
               } catch (error) {

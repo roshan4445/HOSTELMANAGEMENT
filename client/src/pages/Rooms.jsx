@@ -20,8 +20,8 @@ const Rooms = () => {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const [roomsRes, paymentsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/rooms', config),
-        axios.get('http://localhost:5000/api/payments', config)
+        axios.get('https://hostelmanagement-rss4.onrender.com/api/rooms', config),
+        axios.get('https://hostelmanagement-rss4.onrender.com/api/payments', config)
       ]);
       setRooms(roomsRes.data);
       setPayments(paymentsRes.data);
@@ -41,7 +41,7 @@ const Rooms = () => {
     try {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('http://localhost:5000/api/rooms', formData, config);
+      await axios.post('https://hostelmanagement-rss4.onrender.com/api/rooms', formData, config);
       setShowModal(false);
       setFormData({ roomNumber: '', type: 'Non-AC', capacity: 1, rentAmount: '', floor: 1 });
       fetchRooms();

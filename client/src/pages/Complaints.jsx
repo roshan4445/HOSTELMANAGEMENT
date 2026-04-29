@@ -14,7 +14,7 @@ const Complaints = () => {
     try {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get('http://localhost:5000/api/complaints', config);
+      const { data } = await axios.get('https://hostelmanagement-rss4.onrender.com/api/complaints', config);
       setComplaints(data);
       setLoading(false);
     } catch (error) {
@@ -35,7 +35,7 @@ const Complaints = () => {
     try {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`http://localhost:5000/api/complaints/${id}`, { status: newStatus }, config);
+      await axios.put(`https://hostelmanagement-rss4.onrender.com/api/complaints/${id}`, { status: newStatus }, config);
       toast.success('Complaint status updated successfully!');
       fetchComplaints();
     } catch (error) {
