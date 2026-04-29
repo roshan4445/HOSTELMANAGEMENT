@@ -237,10 +237,10 @@ const Tenants = () => {
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-        className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 overflow-hidden overflow-x-auto"
+        className="bg-transparent md:bg-white/80 md:backdrop-blur-md rounded-none md:rounded-2xl md:shadow-sm md:hover:shadow-md transition-shadow md:border border-gray-100 md:overflow-hidden md:overflow-x-auto"
       >
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full block md:table border-collapse">
+          <thead className="hidden md:table-header-group bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
@@ -253,7 +253,7 @@ const Tenants = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="block md:table-row-group md:bg-white md:divide-y divide-gray-200 space-y-4 md:space-y-0 p-2 md:p-0">
             {tenants.map(t => {
               const hasPaid = payments.find(p => p.tenant?._id === t._id && p.month === new Date().getMonth() + 1 && p.year === new Date().getFullYear());
               return { ...t, hasPaid };
@@ -267,23 +267,31 @@ const Tenants = () => {
               if (filterFloor !== 'All' && t.room?.floor !== Number(filterFloor)) return false;
               return true;
             }).map((tenant) => (
-              <tr key={tenant._id} className="hover:bg-gray-50 transition-colors duration-200 group">
-                <td className="px-6 py-5 whitespace-nowrap">
-                  <div className="flex items-center">
+              <tr key={tenant._id} className={`block md:table-row transition-all duration-300 md:hover:bg-gray-50 bg-white border border-gray-100 md:border-none rounded-2xl md:rounded-none shadow-sm md:shadow-none overflow-hidden group ${tenant.status === 'Active' ? 'md:bg-transparent' : 'md:bg-gray-50 opacity-75'}`}>
+                {/* Mobile header color strip based on status */}
+                <div className={`md:hidden h-2 w-full ${tenant.status === 'Active' ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                
+                <td className="px-5 py-4 md:px-6 md:py-5 flex items-center md:table-cell border-b border-gray-50 md:border-none">
+                  <div className="flex items-center w-full">
                     <div className="flex-shrink-0 h-10 w-10 bg-indigo-50 text-indigo-700 rounded-full flex items-center justify-center font-bold shadow-sm border border-indigo-100 group-hover:scale-105 transition-transform">
                       {tenant.name.charAt(0).toUpperCase()}
                     </div>
-                    <div className="ml-4">
+                    <div className="ml-4 flex-1">
                       <div className="font-bold text-gray-900 text-base group-hover:text-indigo-600 transition-colors">{tenant.name}</div>
+                      <div className="md:hidden text-sm font-semibold text-gray-500">{tenant.phone}</div>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-semibold text-gray-800">{tenant.phone}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">{tenant.email}</div>
+                <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none md:block hidden md:table-cell">
+                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Contact</span>
+                  <div className="text-right md:text-left">
+                    <div className="text-sm font-semibold text-gray-800">{tenant.phone}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{tenant.email}</div>
+                  </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex flex-col items-start gap-1.5">
+                <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
+                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Room</span>
+                  <div className="flex flex-col items-end md:items-start gap-1.5">
                     <span className="px-2.5 py-1 text-xs font-bold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm">
                       Room {tenant.room?.roomNumber}
                     </span>
@@ -292,24 +300,35 @@ const Tenants = () => {
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {format(new Date(tenant.moveInDate), 'dd MMM yyyy')}
+                <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
+                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Move In</span>
+                  <span className="text-sm text-gray-800 font-medium">
+                    {format(new Date(tenant.moveInDate), 'dd MMM yyyy')}
+                  </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {tenant.moveOutDate ? format(new Date(tenant.moveOutDate), 'dd MMM yyyy') : '-'}
+                <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
+                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Move Out</span>
+                  <span className="text-sm text-gray-800 font-medium">
+                    {tenant.moveOutDate ? format(new Date(tenant.moveOutDate), 'dd MMM yyyy') : '-'}
+                  </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-bold text-gray-800">₹{tenant.rentAmount}</div>
-                  <div className="text-xs text-gray-500 font-medium mt-0.5">Dep: ₹{tenant.deposit || 0}</div>
+                <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
+                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Rent/Dep</span>
+                  <div className="text-right md:text-left">
+                    <div className="text-sm font-bold text-gray-800">₹{tenant.rentAmount}</div>
+                    <div className="text-xs text-gray-500 font-medium mt-0.5">Dep: ₹{tenant.deposit || 0}</div>
+                  </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
+                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Status</span>
                   <span className={`px-2.5 py-1 text-xs font-bold rounded-md shadow-sm text-white ${
                     tenant.status === 'Active' ? 'bg-green-500' : 'bg-red-500'
                   }`}>
                     {tenant.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
+                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Fee Status</span>
                   {tenant.status === 'Active' ? (
                     <span className={`px-2.5 py-1 text-xs font-bold rounded-md shadow-sm text-white ${
                       tenant.hasPaid ? 'bg-green-500' : 'bg-yellow-500'
@@ -317,29 +336,29 @@ const Tenants = () => {
                       {tenant.hasPaid ? 'Paid' : 'Pending'}
                     </span>
                   ) : (
-                    <span className="text-gray-400 text-xs">-</span>
+                    <span className="text-gray-400 text-xs font-medium">-</span>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <td className="px-5 py-4 md:px-6 md:py-4 flex flex-col sm:flex-row justify-center md:justify-start items-center md:table-cell bg-gray-50/50 md:bg-transparent">
                   {tenant.status === 'Active' && (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 w-full justify-end md:justify-start">
                       {!tenant.noticeGiven ? (
                         <motion.button 
                           whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
                           onClick={() => { setNoticeTenantId(tenant._id); setShowNoticeModal(true); }} 
-                          className="px-3 py-1.5 bg-yellow-50 text-yellow-700 font-bold text-xs border border-yellow-200 rounded-md hover:bg-yellow-600 hover:text-white transition-all shadow-sm"
+                          className="flex-1 md:flex-none justify-center px-3 py-2 md:py-1.5 bg-yellow-50 text-yellow-700 font-bold text-sm md:text-xs border border-yellow-200 rounded-lg md:rounded-md hover:bg-yellow-600 hover:text-white transition-all shadow-sm"
                         >
                           Give Notice
                         </motion.button>
                       ) : (
-                        <span className="text-xs font-bold text-yellow-700 px-2.5 py-1.5 bg-yellow-100 rounded-md border border-yellow-300 shadow-sm">
+                        <span className="flex-1 md:flex-none justify-center text-center text-xs font-bold text-yellow-700 px-2.5 py-2 md:py-1.5 bg-yellow-100 rounded-lg md:rounded-md border border-yellow-300 shadow-sm">
                           Notice: {format(new Date(tenant.moveOutDate), 'dd MMM')}
                         </span>
                       )}
                       <motion.button 
                         whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
                         onClick={() => handleMoveOut(tenant._id)} 
-                        className="px-3 py-1.5 bg-rose-50 text-rose-700 font-bold text-xs border border-rose-200 rounded-md hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+                        className="flex-1 md:flex-none justify-center px-3 py-2 md:py-1.5 bg-rose-50 text-rose-700 font-bold text-sm md:text-xs border border-rose-200 rounded-lg md:rounded-md hover:bg-rose-600 hover:text-white transition-all shadow-sm"
                       >
                         Move Out
                       </motion.button>

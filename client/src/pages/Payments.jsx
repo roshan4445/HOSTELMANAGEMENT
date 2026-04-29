@@ -164,10 +164,10 @@ const Payments = () => {
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-        className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 overflow-hidden overflow-x-auto"
+        className="bg-transparent md:bg-white/80 md:backdrop-blur-md rounded-none md:rounded-2xl md:shadow-sm md:hover:shadow-md transition-shadow md:border border-gray-100 md:overflow-hidden md:overflow-x-auto"
       >
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full block md:table border-collapse">
+          <thead className="hidden md:table-header-group bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tenant</th>
               <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Room</th>
@@ -178,27 +178,39 @@ const Payments = () => {
               <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="block md:table-row-group md:bg-white md:divide-y divide-gray-200 space-y-4 md:space-y-0 p-2 md:p-0">
             {payments.map(payment => (
-              <tr key={payment._id} className={`transition-all duration-300 hover:bg-gray-50 ${payment.status === 'Paid' ? 'bg-green-50' : 'bg-red-50 border-l-4 border-red-400'}`}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="font-bold text-gray-900 text-base">{payment.tenant?.name || 'Unknown'}</div>
+              <tr key={payment._id} className={`block md:table-row transition-all duration-300 md:hover:bg-gray-50 bg-white border border-gray-100 md:border-none rounded-2xl md:rounded-none shadow-sm md:shadow-none overflow-hidden ${payment.status === 'Paid' ? 'md:bg-green-50' : 'md:bg-red-50 md:border-l-4 md:border-red-400'}`}>
+                {/* Mobile header color strip based on status */}
+                <div className={`md:hidden h-2 w-full ${payment.status === 'Paid' ? 'bg-green-400' : payment.status === 'Overdue' ? 'bg-red-400' : 'bg-yellow-400'}`}></div>
+                
+                <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
+                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Tenant</span>
+                  <div className="font-bold text-gray-900 text-base text-right md:text-left">{payment.tenant?.name || 'Unknown'}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2.5 py-1 text-xs font-bold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm">
+                <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
+                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Room</span>
+                  <span className="px-2.5 py-1 text-xs font-bold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm text-right md:text-left">
                     Room {payment.room?.roomNumber || 'N/A'}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-semibold text-gray-800">{payment.monthString || `${payment.year}-${String(payment.month).padStart(2, '0')}`}</div>
-                  <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Due: {payment.dueDate ? format(new Date(payment.dueDate), 'dd MMM') : '-'}</div>
+                <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
+                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Month</span>
+                  <div className="text-right md:text-left">
+                    <div className="text-sm font-semibold text-gray-800">{payment.monthString || `${payment.year}-${String(payment.month).padStart(2, '0')}`}</div>
+                    <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Due: {payment.dueDate ? format(new Date(payment.dueDate), 'dd MMM') : '-'}</div>
+                  </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-bold text-gray-800">₹{payment.total}</div>
-                  {payment.fine > 0 && <div className="text-[10px] text-red-500 font-bold uppercase mt-1">Inc. ₹{payment.fine} fine</div>}
+                <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
+                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Amount</span>
+                  <div className="text-right md:text-left">
+                    <div className="text-sm font-bold text-gray-800">₹{payment.total}</div>
+                    {payment.fine > 0 && <div className="text-[10px] text-red-500 font-bold uppercase mt-1">Inc. ₹{payment.fine} fine</div>}
+                  </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2.5 py-1 text-xs font-bold rounded-md shadow-sm text-white ${
+                <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
+                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Status</span>
+                  <span className={`px-2.5 py-1 text-xs font-bold rounded-md shadow-sm text-white text-right md:text-left ${
                     payment.status === 'Paid' ? 'bg-green-500' : 
                     payment.status === 'Overdue' ? 'bg-red-500' : 
                     'bg-yellow-500'
@@ -206,32 +218,37 @@ const Payments = () => {
                     {payment.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {payment.status === 'Paid' ? (
-                    <div>
-                      <div className="text-sm font-semibold text-gray-800">{payment.paymentMode || 'UPI'}</div>
-                      <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">{payment.paymentDate ? format(new Date(payment.paymentDate), 'dd MMM yyyy') : '-'}</div>
-                    </div>
-                  ) : (
-                    <span className="text-gray-400 text-sm font-medium">-</span>
-                  )}
+                <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
+                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Mode</span>
+                  <div className="text-right md:text-left">
+                    {payment.status === 'Paid' ? (
+                      <div>
+                        <div className="text-sm font-semibold text-gray-800">{payment.paymentMode || 'UPI'}</div>
+                        <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">{payment.paymentDate ? format(new Date(payment.paymentDate), 'dd MMM yyyy') : '-'}</div>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 text-sm font-medium">-</span>
+                    )}
+                  </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  {payment.status !== 'Paid' && (
+                <td className="px-5 py-4 md:px-6 md:py-4 flex justify-center md:justify-start items-center md:table-cell bg-gray-50/50 md:bg-transparent">
+                  {payment.status !== 'Paid' ? (
                     <motion.button 
                       whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
                       onClick={() => openPaymentModal(payment)} 
-                      className="px-3 py-1.5 bg-emerald-50 text-emerald-700 font-bold text-xs border border-emerald-200 rounded-md hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                      className="w-full md:w-auto px-4 py-2 md:px-3 md:py-1.5 bg-emerald-50 text-emerald-700 font-bold text-sm md:text-xs border border-emerald-200 rounded-lg md:rounded-md hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
                     >
                       Mark Paid
                     </motion.button>
+                  ) : (
+                    <span className="md:hidden text-xs font-bold text-green-600 uppercase">Payment Completed</span>
                   )}
                 </td>
               </tr>
             ))}
             {payments.length === 0 && (
-              <tr>
-                <td colSpan="7" className="px-6 py-12 text-center">
+              <tr className="block md:table-row">
+                <td colSpan="7" className="block md:table-cell px-6 py-12 text-center bg-white rounded-2xl md:rounded-none border md:border-none border-gray-100">
                   <FileText className="mx-auto h-12 w-12 text-gray-300 mb-3" />
                   <p className="text-gray-500 font-medium text-lg">No rent records found.</p>
                   <p className="text-gray-400 text-sm mt-1">Click 'Generate Monthly Rent' to create entries for all active tenants.</p>
