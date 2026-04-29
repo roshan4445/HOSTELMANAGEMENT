@@ -22,7 +22,7 @@ const Dashboard = () => {
       try {
         const token = JSON.parse(localStorage.getItem('userInfo')).token;
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        const { data } = await axios.get('http://localhost:5000/api/dashboard', config);
+        const { data } = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/dashboard`, config);
         setStats(data);
         setLoading(false);
       } catch (error) {

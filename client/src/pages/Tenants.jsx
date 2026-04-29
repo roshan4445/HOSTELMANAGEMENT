@@ -32,9 +32,9 @@ const Tenants = () => {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const [tenantsRes, roomsRes, paymentsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/tenants', config),
-        axios.get('http://localhost:5000/api/rooms', config),
-        axios.get('http://localhost:5000/api/payments', config)
+        axios.get(`${import.meta.env.VITE_SERVER_URL}/api/tenants`, config),
+        axios.get(`${import.meta.env.VITE_SERVER_URL}/api/rooms`, config),
+        axios.get(`${import.meta.env.VITE_SERVER_URL}/api/payments`, config)
       ]);
       setTenants(tenantsRes.data);
       setRooms(roomsRes.data.filter(r => r.status !== 'Occupied'));
@@ -55,7 +55,7 @@ const Tenants = () => {
     try {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('http://localhost:5000/api/tenants', formData, config);
+      await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/tenants`, formData, config);
       toast.success('Tenant added successfully!');
       setShowModal(false);
       fetchData();
@@ -98,7 +98,7 @@ const Tenants = () => {
               try {
                 const token = JSON.parse(localStorage.getItem('userInfo')).token;
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                await axios.put(`http://localhost:5000/api/tenants/${tenantId}/moveout`, {}, config);
+                await axios.put(`${import.meta.env.VITE_SERVER_URL}/api/tenants/${tenantId}/moveout`, {}, config);
                 toast.success('Tenant moved out successfully!');
                 fetchData();
               } catch (error) {
