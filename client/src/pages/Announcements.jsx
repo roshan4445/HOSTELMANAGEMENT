@@ -15,7 +15,7 @@ const Announcements = () => {
     try {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/announcements`, config);
+      const { data } = await axios.get('https://hostelmanagement-rss4.onrender.com/api/announcements', config);
       setAnnouncements(data);
       setLoading(false);
     } catch (error) {
@@ -34,7 +34,7 @@ const Announcements = () => {
     try {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/announcements`, formData, config);
+      await axios.post('https://hostelmanagement-rss4.onrender.com/api/announcements', formData, config);
       toast.success('Announcement posted successfully!');
       setShowModal(false);
       setFormData({ title: '', message: '', priority: 'Low' });
@@ -62,7 +62,7 @@ const Announcements = () => {
               try {
                 const token = JSON.parse(localStorage.getItem('userInfo')).token;
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                await axios.delete(`${import.meta.env.VITE_SERVER_URL}/api/announcements/${id}`, config);
+                await axios.delete(`https://hostelmanagement-rss4.onrender.com/api/announcements/${id}`, config);
                 toast.success('Announcement deleted');
                 fetchAnnouncements();
               } catch (error) {

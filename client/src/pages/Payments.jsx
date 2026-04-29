@@ -19,7 +19,7 @@ const Payments = () => {
     try {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/payments`, config);
+      const { data } = await axios.get('https://hostelmanagement-rss4.onrender.com/api/payments', config);
       setPayments(data);
       setLoading(false);
     } catch (error) {
@@ -51,7 +51,7 @@ const Payments = () => {
               try {
                 const token = JSON.parse(localStorage.getItem('userInfo')).token;
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                const { data } = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/payments/generate`, {}, config);
+                const { data } = await axios.post('https://hostelmanagement-rss4.onrender.com/api/payments/generate', {}, config);
                 toast.success(data.message);
                 fetchPayments();
               } catch (error) {
@@ -72,7 +72,7 @@ const Payments = () => {
     try {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`${import.meta.env.VITE_SERVER_URL}/api/payments/${selectedPayment._id}/pay`, {
+      await axios.put(`https://hostelmanagement-rss4.onrender.com/api/payments/${selectedPayment._id}/pay`, {
         paymentMode: formData.paymentMode
       }, config);
       setShowModal(false);
@@ -140,7 +140,7 @@ const Payments = () => {
             onClick={async () => {
               try {
                 const token = JSON.parse(localStorage.getItem('userInfo')).token;
-                await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/payments/test-overdue`, {}, { headers: { Authorization: `Bearer ${token}` } });
+                await axios.post('https://hostelmanagement-rss4.onrender.com/api/payments/test-overdue', {}, { headers: { Authorization: `Bearer ${token}` } });
                 toast.success('Overdue check completed! Refreshing data...');
                 fetchData();
               } catch (e) {
