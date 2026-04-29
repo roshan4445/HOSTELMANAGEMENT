@@ -65,11 +65,56 @@ exports.moveOutTenant = async (req, res) => {
       const room = await Room.findById(tenant.room);
       if (room) {
         room.occupants = room.occupants.filter(occ => occ.toString() !== tenant._id.toString());
+        // Clear upcoming vacancy if it was set
+        room.upcomingVacancy = { isLeaving: false, availableFrom: null };
         await room.save();
       }
     }
 
     res.json({ message: 'Tenant moved out successfully', tenant });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.giveNotice = async (req, res) => {
+  try {
+    const { moveOutDate } = req.body;
+    if (!moveOutDate) return res.status(400).json({ message: 'Move-out date is required' });
+
+    const tenant = await Tenant.findOne({ _id: req.params.id, owner: req.user._id });
+    if (!tenant) return res.status(404).json({ message: 'Tenant not found' });
+    if (tenant.status === 'MovedOut') return res.status(400).json({ message: 'Tenant already moved out' });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const plannedMoveOut = new Date(moveOutDate);
+    plannedMoveOut.setHours(0, 0, 0, 0);
+
+    const diffTime = plannedMoveOut - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 15) {
+      return res.status(400).json({ message: 'Notice period must be at least 15 days from today.' });
+    }
+
+    tenant.noticeGiven = true;
+    tenant.noticeDate = new Date();
+    tenant.moveOutDate = plannedMoveOut;
+    await tenant.save();
+
+    if (tenant.room) {
+      const room = await Room.findById(tenant.room);
+      if (room) {
+        room.upcomingVacancy = {
+          isLeaving: true,
+          availableFrom: plannedMoveOut
+        };
+        await room.save();
+      }
+    }
+
+    res.json({ message: 'Notice submitted successfully', tenant });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -7,7 +7,11 @@ const roomSchema = new mongoose.Schema({
   capacity: { type: Number, required: true, default: 1 },
   rentAmount: { type: Number, required: true },
   floor: { type: Number, required: true, default: 1 },
-  occupants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' }]
+  occupants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' }],
+  upcomingVacancy: {
+    isLeaving: { type: Boolean, default: false },
+    availableFrom: { type: Date }
+  }
 }, { timestamps: true });
 
 roomSchema.virtual('status').get(function() {

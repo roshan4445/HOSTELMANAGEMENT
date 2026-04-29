@@ -15,6 +15,10 @@ const Tenants = () => {
   const [formData, setFormData] = useState({ name: '', phone: '', email: '', moveInDate: '', roomId: '', paymentMethod: 'UPI', rentAmount: '', deposit: '', aadhaarImage: '' });
   const [filterStatus, setFilterStatus] = useState('All');
   
+  const [showNoticeModal, setShowNoticeModal] = useState(false);
+  const [noticeTenantId, setNoticeTenantId] = useState(null);
+  const [noticeDate, setNoticeDate] = useState('');
+
   const todayDate = new Date();
   const minDate = new Date();
   minDate.setDate(todayDate.getDate() - 10);
@@ -22,6 +26,11 @@ const Tenants = () => {
   maxDate.setDate(todayDate.getDate() + 10);
   const minDateStr = minDate.toISOString().split('T')[0];
   const maxDateStr = maxDate.toISOString().split('T')[0];
+  
+  const minNoticeDateObj = new Date();
+  minNoticeDateObj.setDate(todayDate.getDate() + 15);
+  const minNoticeDateStr = minNoticeDateObj.toISOString().split('T')[0];
+
   const [searchName, setSearchName] = useState('');
   const [filterFeeStatus, setFilterFeeStatus] = useState('All');
   const [filterFloor, setFilterFloor] = useState('All');
@@ -32,9 +41,9 @@ const Tenants = () => {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const [tenantsRes, roomsRes, paymentsRes] = await Promise.all([
-        axios.get('https://hostelmanagement-rss4.onrender.com/api/tenants', config),
-        axios.get('https://hostelmanagement-rss4.onrender.com/api/rooms', config),
-        axios.get('https://hostelmanagement-rss4.onrender.com/api/payments', config)
+        axios.get('http://localhost:5000/api/tenants', config),
+        axios.get('http://localhost:5000/api/rooms', config),
+        axios.get('http://localhost:5000/api/payments', config)
       ]);
       setTenants(tenantsRes.data);
       setRooms(roomsRes.data.filter(r => r.status !== 'Occupied'));
@@ -55,7 +64,7 @@ const Tenants = () => {
     try {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('https://hostelmanagement-rss4.onrender.com/api/tenants', formData, config);
+      await axios.post('http://localhost:5000/api/tenants', formData, config);
       toast.success('Tenant added successfully!');
       setShowModal(false);
       fetchData();
@@ -80,6 +89,22 @@ const Tenants = () => {
     }
   };
 
+  const handleGiveNotice = async (e) => {
+    e.preventDefault();
+    try {
+      const token = JSON.parse(localStorage.getItem('userInfo')).token;
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await axios.post(`http://localhost:5000/api/tenants/${noticeTenantId}/notice`, { moveOutDate: noticeDate }, config);
+      toast.success('Notice submitted successfully!');
+      setShowNoticeModal(false);
+      setNoticeTenantId(null);
+      setNoticeDate('');
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Error submitting notice');
+    }
+  };
+
   const handleMoveOut = (tenantId) => {
     toast((t) => (
       <div>
@@ -98,7 +123,7 @@ const Tenants = () => {
               try {
                 const token = JSON.parse(localStorage.getItem('userInfo')).token;
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                await axios.put(`https://hostelmanagement-rss4.onrender.com/api/tenants/${tenantId}/moveout`, {}, config);
+                await axios.put(`http://localhost:5000/api/tenants/${tenantId}/moveout`, {}, config);
                 toast.success('Tenant moved out successfully!');
                 fetchData();
               } catch (error) {
@@ -297,13 +322,28 @@ const Tenants = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   {tenant.status === 'Active' && (
-                    <motion.button 
-                      whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
-                      onClick={() => handleMoveOut(tenant._id)} 
-                      className="px-3 py-1.5 bg-rose-50 text-rose-700 font-bold text-xs border border-rose-200 rounded-md hover:bg-rose-600 hover:text-white transition-all shadow-sm"
-                    >
-                      Move Out
-                    </motion.button>
+                    <div className="flex gap-2">
+                      {!tenant.noticeGiven ? (
+                        <motion.button 
+                          whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
+                          onClick={() => { setNoticeTenantId(tenant._id); setShowNoticeModal(true); }} 
+                          className="px-3 py-1.5 bg-yellow-50 text-yellow-700 font-bold text-xs border border-yellow-200 rounded-md hover:bg-yellow-600 hover:text-white transition-all shadow-sm"
+                        >
+                          Give Notice
+                        </motion.button>
+                      ) : (
+                        <span className="text-xs font-bold text-yellow-700 px-2.5 py-1.5 bg-yellow-100 rounded-md border border-yellow-300 shadow-sm">
+                          Notice: {format(new Date(tenant.moveOutDate), 'dd MMM')}
+                        </span>
+                      )}
+                      <motion.button 
+                        whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
+                        onClick={() => handleMoveOut(tenant._id)} 
+                        className="px-3 py-1.5 bg-rose-50 text-rose-700 font-bold text-xs border border-rose-200 rounded-md hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+                      >
+                        Move Out
+                      </motion.button>
+                    </div>
                   )}
                 </td>
               </tr>
@@ -380,6 +420,32 @@ const Tenants = () => {
                 <div className="flex justify-end space-x-3 mt-8">
                   <button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
                   <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" className="px-5 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl shadow-sm hover:bg-indigo-700 transition-colors">Save Tenant</motion.button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showNoticeModal && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-white p-8 rounded-2xl w-[400px] shadow-xl"
+            >
+              <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-4">Give 15-Day Notice</h2>
+              <form onSubmit={handleGiveNotice}>
+                <div className="mb-4">
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">Move-out Date</label>
+                  <input required type="date" min={minNoticeDateStr} className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-all" value={noticeDate} onChange={e => setNoticeDate(e.target.value)} />
+                  <p className="text-xs text-gray-500 mt-2 ml-1">Must be at least 15 days from today.</p>
+                </div>
+                <div className="flex justify-end space-x-3 mt-8">
+                  <button type="button" onClick={() => { setShowNoticeModal(false); setNoticeTenantId(null); setNoticeDate(''); }} className="px-5 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
+                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" className="px-5 py-2.5 bg-yellow-500 text-white font-semibold rounded-xl shadow-sm hover:bg-yellow-600 transition-colors">Submit Notice</motion.button>
                 </div>
               </form>
             </motion.div>

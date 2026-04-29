@@ -20,8 +20,8 @@ const Rooms = () => {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const [roomsRes, paymentsRes] = await Promise.all([
-        axios.get('https://hostelmanagement-rss4.onrender.com/api/rooms', config),
-        axios.get('https://hostelmanagement-rss4.onrender.com/api/payments', config)
+        axios.get('http://localhost:5000/api/rooms', config),
+        axios.get('http://localhost:5000/api/payments', config)
       ]);
       setRooms(roomsRes.data);
       setPayments(paymentsRes.data);
@@ -41,7 +41,7 @@ const Rooms = () => {
     try {
       const token = JSON.parse(localStorage.getItem('userInfo')).token;
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('https://hostelmanagement-rss4.onrender.com/api/rooms', formData, config);
+      await axios.post('http://localhost:5000/api/rooms', formData, config);
       setShowModal(false);
       setFormData({ roomNumber: '', type: 'Non-AC', capacity: 1, rentAmount: '', floor: 1 });
       fetchRooms();
@@ -154,12 +154,13 @@ const Rooms = () => {
                 layout 
                 initial={{ scale: 0.8, opacity: 0 }} 
                 animate={{ scale: 1, opacity: 1 }} 
-                className={`px-2.5 py-1 text-xs font-bold rounded-md shadow-sm text-white ${
-                  room.status === 'Vacant' ? 'bg-green-500' :
-                  room.status === 'Occupied' || room.status === 'Full' ? 'bg-red-500' : 'bg-yellow-500'
+                className={`px-2.5 py-1 text-xs font-bold rounded-md shadow-sm ${
+                  room.upcomingVacancy?.isLeaving ? 'bg-yellow-400 text-yellow-900' :
+                  room.status === 'Vacant' ? 'bg-green-500 text-white' :
+                  room.status === 'Occupied' || room.status === 'Full' ? 'bg-red-500 text-white' : 'bg-yellow-500 text-white'
                 }`}
               >
-                {room.status}
+                {room.upcomingVacancy?.isLeaving ? `${room.occupants?.filter(o => o.noticeGiven)?.length || 1} Bed(s) Avail. from ${new Date(room.upcomingVacancy.availableFrom).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}` : room.status}
               </motion.span>
             </div>
             <div className="text-gray-600 space-y-2.5 text-sm">
@@ -241,10 +242,11 @@ const Rooms = () => {
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">Status</p>
                   <span className={`px-2 py-1 text-xs font-semibold rounded-md border ${
+                    selectedRoom.upcomingVacancy?.isLeaving ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
                     selectedRoom.status === 'Vacant' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
                     selectedRoom.status === 'Occupied' ? 'bg-rose-50 text-rose-700 border-rose-100' : 'bg-amber-50 text-amber-700 border-amber-100'
                   }`}>
-                    {selectedRoom.status}
+                    {selectedRoom.upcomingVacancy?.isLeaving ? `${selectedRoom.occupants?.filter(o => o.noticeGiven)?.length || 1} Bed(s) Avail. from ${new Date(selectedRoom.upcomingVacancy.availableFrom).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}` : selectedRoom.status}
                   </span>
                 </div>
                 <div>

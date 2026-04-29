@@ -10,6 +10,8 @@ const tenantSchema = new mongoose.Schema({
   aadhaarImage: { type: String },
   moveInDate: { type: Date, required: true },
   moveOutDate: { type: Date },
+  noticeGiven: { type: Boolean, default: false },
+  noticeDate: { type: Date },
   room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' },
   paymentMethod: { type: String, enum: ['UPI', 'Cash'], default: 'UPI' },
   status: { type: String, enum: ['Active', 'MovedOut'], default: 'Active' },

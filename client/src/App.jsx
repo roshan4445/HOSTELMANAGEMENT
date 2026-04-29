@@ -10,6 +10,7 @@ import Tenants from './pages/Tenants';
 import Payments from './pages/Payments';
 import Complaints from './pages/Complaints';
 import Announcements from './pages/Announcements';
+import PublicView from './pages/PublicView';
 
 import { Menu } from 'lucide-react';
 
@@ -59,6 +60,7 @@ const AppRoutes = () => {
       <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
       <Route path="/complaints" element={<ProtectedRoute><Complaints /></ProtectedRoute>} />
       <Route path="/announcements" element={<ProtectedRoute><Announcements /></ProtectedRoute>} />
+      <Route path="/pg/:pgName" element={<PublicView />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
