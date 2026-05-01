@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import RoomService from '../services/roomService';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -13,7 +13,7 @@ const PublicView = () => {
   useEffect(() => {
     const fetchPublicRooms = async () => {
       try {
-        const { data } = await axios.get(`https://hostelmanagement-rss4.onrender.com/api/rooms/public/${pgName}`);
+        const data = await RoomService.getPublic(pgName);
         setRooms(data.rooms);
         setActualPgName(data.pgName);
         setLoading(false);

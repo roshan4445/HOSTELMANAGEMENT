@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import ComplaintService from '../services/complaintService';
+import socket from '../socket';
 import { AlertCircle, CheckCircle, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
@@ -12,9 +13,7 @@ const Complaints = () => {
 
   const fetchComplaints = async () => {
     try {
-      const token = JSON.parse(localStorage.getItem('userInfo')).token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get('https://hostelmanagement-rss4.onrender.com/api/complaints', config);
+      const data = await ComplaintService.getAll();
       setComplaints(data);
       setLoading(false);
     } catch (error) {
@@ -26,16 +25,33 @@ const Complaints = () => {
   useEffect(() => {
     fetchComplaints();
     
-    // Poll every 30 seconds to fetch new complaints dynamically if the user stays on the page
-    const interval = setInterval(fetchComplaints, 30000);
-    return () => clearInterval(interval);
+    // Connect socket to listen for real-time complaint updates
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    if (userInfo) {
+      if (!socket.connected) socket.connect();
+      socket.emit('join-owner', userInfo._id);
+
+      socket.on('complaint-new', (newComplaint) => {
+        setComplaints(prev => [newComplaint, ...prev]);
+        toast.success(`New complaint: ${newComplaint.title}`, { icon: '🚨' });
+      });
+
+      socket.on('complaint-updated', (updatedComplaint) => {
+        setComplaints(prev =>
+          prev.map(c => c._id === updatedComplaint._id ? updatedComplaint : c)
+        );
+      });
+    }
+
+    return () => {
+      socket.off('complaint-new');
+      socket.off('complaint-updated');
+    };
   }, []);
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      const token = JSON.parse(localStorage.getItem('userInfo')).token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`https://hostelmanagement-rss4.onrender.com/api/complaints/${id}`, { status: newStatus }, config);
+      await ComplaintService.updateStatus(id, newStatus);
       toast.success('Complaint status updated successfully!');
       fetchComplaints();
     } catch (error) {

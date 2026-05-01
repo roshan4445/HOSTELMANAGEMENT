@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import TenantService from '../services/tenantService';
+import RoomService from '../services/roomService';
+import PaymentService from '../services/paymentService';
 import { Plus, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { exportToCSV } from '../utils/exportToCSV';
@@ -12,7 +14,7 @@ const Tenants = () => {
   const [rooms, setRooms] = useState([]);
   const [payments, setPayments] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ name: '', phone: '', email: '', moveInDate: '', roomId: '', paymentMethod: 'UPI', rentAmount: '', deposit: '', aadhaarImage: '' });
+  const [formData, setFormData] = useState({ name: '', phone: '', email: '', moveInDate: '', roomId: '', paymentMethod: 'UPI', rentAmount: '', deposit: '', aadhaarImage: null });
   const [filterStatus, setFilterStatus] = useState('All');
   
   const [showNoticeModal, setShowNoticeModal] = useState(false);
@@ -38,16 +40,14 @@ const Tenants = () => {
 
   const fetchData = async () => {
     try {
-      const token = JSON.parse(localStorage.getItem('userInfo')).token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const [tenantsRes, roomsRes, paymentsRes] = await Promise.all([
-        axios.get('https://hostelmanagement-rss4.onrender.com/api/tenants', config),
-        axios.get('https://hostelmanagement-rss4.onrender.com/api/rooms', config),
-        axios.get('https://hostelmanagement-rss4.onrender.com/api/payments', config)
+      const [tenantsData, roomsData, paymentsResult] = await Promise.all([
+        TenantService.getAll(),
+        RoomService.getAll(),
+        PaymentService.getAll({ limit: 500 })
       ]);
-      setTenants(tenantsRes.data);
-      setRooms(roomsRes.data.filter(r => r.status !== 'Occupied'));
-      setPayments(paymentsRes.data);
+      setTenants(tenantsData);
+      setRooms(roomsData.filter(r => r.status !== 'Occupied'));
+      setPayments(paymentsResult.data || paymentsResult);
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -62,9 +62,11 @@ const Tenants = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = JSON.parse(localStorage.getItem('userInfo')).token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('https://hostelmanagement-rss4.onrender.com/api/tenants', formData, config);
+      const data = new FormData();
+      Object.keys(formData).forEach(key => {
+        data.append(key, formData[key]);
+      });
+      await TenantService.create(data);
       toast.success('Tenant added successfully!');
       setShowModal(false);
       fetchData();
@@ -76,25 +78,19 @@ const Tenants = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.type !== 'image/png') {
-        toast.error('Only PNG images are allowed for Aadhaar Card');
+      if (!file.type.startsWith('image/')) {
+        toast.error('Only images are allowed for Aadhaar Card');
         e.target.value = null;
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, aadhaarImage: reader.result });
-      };
-      reader.readAsDataURL(file);
+      setFormData({ ...formData, aadhaarImage: file });
     }
   };
 
   const handleGiveNotice = async (e) => {
     e.preventDefault();
     try {
-      const token = JSON.parse(localStorage.getItem('userInfo')).token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post(`https://hostelmanagement-rss4.onrender.com/api/tenants/${noticeTenantId}/notice`, { moveOutDate: noticeDate }, config);
+      await TenantService.giveNotice(noticeTenantId, noticeDate);
       toast.success('Notice submitted successfully!');
       setShowNoticeModal(false);
       setNoticeTenantId(null);
@@ -121,9 +117,7 @@ const Tenants = () => {
             onClick={async () => {
               toast.dismiss(t.id);
               try {
-                const token = JSON.parse(localStorage.getItem('userInfo')).token;
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-                await axios.put(`https://hostelmanagement-rss4.onrender.com/api/tenants/${tenantId}/moveout`, {}, config);
+                await TenantService.moveOut(tenantId);
                 toast.success('Tenant moved out successfully!');
                 fetchData();
               } catch (error) {
@@ -228,10 +222,9 @@ const Tenants = () => {
           onChange={(e) => setFilterFloor(e.target.value)}
         >
           <option value="All">All Floors</option>
-          <option value="1">Floor 1</option>
-          <option value="2">Floor 2</option>
-          <option value="3">Floor 3</option>
-          <option value="4">Floor 4</option>
+          {[...new Set(tenants.map(t => t.room?.floor).filter(Boolean))].sort((a, b) => a - b).map(floor => (
+            <option key={floor} value={floor}>Floor {floor}</option>
+          ))}
         </select>
       </div>
 
@@ -291,11 +284,11 @@ const Tenants = () => {
                 </td>
                 <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
                   <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Room</span>
-                  <div className="flex flex-col items-end md:items-start gap-1.5">
-                    <span className="px-2.5 py-1 text-xs font-bold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm">
+                  <div className="flex flex-col items-end md:items-start gap-1.5 whitespace-nowrap">
+                    <span className="px-2.5 py-1 text-xs font-bold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm whitespace-nowrap">
                       Room {tenant.room?.roomNumber}
                     </span>
-                    <span className="px-2 py-0.5 text-[11px] font-semibold rounded-md bg-gray-100 text-gray-600 border border-gray-200">
+                    <span className="px-2 py-0.5 text-[11px] font-semibold rounded-md bg-gray-100 text-gray-600 border border-gray-200 whitespace-nowrap">
                       Floor {tenant.room?.floor || 1}
                     </span>
                   </div>
@@ -432,8 +425,8 @@ const Tenants = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">Aadhaar Card (PNG)</label>
-                    <input type="file" accept="image/png" className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={handleFileChange} />
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">Aadhaar Card (Image) *</label>
+                    <input required type="file" accept="image/*" className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={handleFileChange} />
                   </div>
                 </div>
                 <div className="flex justify-end space-x-3 mt-8">

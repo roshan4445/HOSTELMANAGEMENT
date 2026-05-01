@@ -16,4 +16,10 @@ const paymentSchema = new mongoose.Schema({
   monthString: { type: String, required: true } // format: YYYY-MM
 }, { timestamps: true });
 
+// Performance indexes for frequent query patterns
+paymentSchema.index({ owner: 1, monthString: 1 });
+paymentSchema.index({ owner: 1, year: -1, month: -1 });
+paymentSchema.index({ tenant: 1, monthString: 1 });
+paymentSchema.index({ status: 1, dueDate: 1 });
+
 module.exports = mongoose.model('Payment', paymentSchema);

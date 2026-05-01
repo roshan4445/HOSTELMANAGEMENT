@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/auth');
-const { getComplaints, updateComplaintStatus } = require('../controllers/complaintController');
+const { protect, requireRole } = require('../middleware/auth');
+const { getComplaints, updateComplaintStatus, createComplaint } = require('../controllers/complaintController');
+const { validateCreateComplaint, validateUpdateComplaintStatus } = require('../middleware/validate');
 
 router.route('/')
-  .get(protect, getComplaints);
+  .get(protect, getComplaints)
+  .post(protect, validateCreateComplaint, createComplaint);
 
 router.route('/:id')
-  .put(protect, updateComplaintStatus);
+  .put(protect, requireRole('owner'), validateUpdateComplaintStatus, updateComplaintStatus);
 
 module.exports = router;

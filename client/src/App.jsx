@@ -12,14 +12,25 @@ import Complaints from './pages/Complaints';
 import Announcements from './pages/Announcements';
 import PublicView from './pages/PublicView';
 
+import TenantLayout from './components/tenant/TenantLayout';
+import TenantDashboard from './pages/tenant/TenantDashboard';
+import TenantRent from './pages/tenant/TenantRent';
+import TenantComplaints from './pages/tenant/TenantComplaints';
+import TenantAlerts from './pages/tenant/TenantAlerts';
+
 import { Menu } from 'lucide-react';
 
-const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext);
+const ProtectedRoute = ({ children, requireRole }) => {
+  const { user, loading, logout } = useContext(AuthContext);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (loading) return <div>Loading...</div>;
   if (!user) return <Navigate to="/login" />;
+  if (requireRole && user.role !== requireRole) return <Navigate to="/" />;
+  
+  if (user.role === 'tenant') {
+    return <TenantLayout user={user} logout={logout}>{children}</TenantLayout>;
+  }
   
   return (
     <div className="flex bg-gradient-to-br from-gray-50 to-indigo-50 min-h-screen w-full overflow-x-hidden">
@@ -54,28 +65,50 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
-      <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/rooms" element={<ProtectedRoute><Rooms /></ProtectedRoute>} />
-      <Route path="/tenants" element={<ProtectedRoute><Tenants /></ProtectedRoute>} />
-      <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
-      <Route path="/complaints" element={<ProtectedRoute><Complaints /></ProtectedRoute>} />
-      <Route path="/announcements" element={<ProtectedRoute><Announcements /></ProtectedRoute>} />
+      <Route path="/" element={
+        <ProtectedRoute>
+          {user?.role === 'tenant' ? <TenantDashboard /> : <Dashboard />}
+        </ProtectedRoute>
+      } />
+      
+      {/* Admin Only Routes */}
+      <Route path="/rooms" element={<ProtectedRoute requireRole="owner"><Rooms /></ProtectedRoute>} />
+      <Route path="/tenants" element={<ProtectedRoute requireRole="owner"><Tenants /></ProtectedRoute>} />
+      
+      {/* Shared/Dynamic Routes based on role */}
+      <Route path="/payments" element={<ProtectedRoute requireRole="owner"><Payments /></ProtectedRoute>} />
+      
+      <Route path="/complaints" element={
+        <ProtectedRoute>
+          {user?.role === 'tenant' ? <TenantComplaints /> : <Complaints />}
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/announcements" element={<ProtectedRoute requireRole="owner"><Announcements /></ProtectedRoute>} />
+      
+      {/* Tenant Only Routes */}
+      <Route path="/rent" element={<ProtectedRoute requireRole="tenant"><TenantRent /></ProtectedRoute>} />
+      <Route path="/alerts" element={<ProtectedRoute requireRole="tenant"><TenantAlerts /></ProtectedRoute>} />
+
       <Route path="/pg/:pgName" element={<PublicView />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 };
 
+import ErrorBoundary from './components/ErrorBoundary';
 import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Toaster position="top-right" toastOptions={{ style: { borderRadius: '12px', background: '#333', color: '#fff' } }} />
-        <AppRoutes />
-      </Router>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Router>
+          <Toaster position="top-right" toastOptions={{ style: { borderRadius: '12px', background: '#333', color: '#fff' } }} />
+          <AppRoutes />
+        </Router>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

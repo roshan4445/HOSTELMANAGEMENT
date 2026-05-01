@@ -24,4 +24,7 @@ roomSchema.virtual('status').get(function() {
 roomSchema.set('toJSON', { virtuals: true });
 roomSchema.set('toObject', { virtuals: true });
 
+// Performance indexes — compound unique prevents duplicate rooms per owner
+roomSchema.index({ owner: 1, roomNumber: 1 }, { unique: true });
+
 module.exports = mongoose.model('Room', roomSchema);

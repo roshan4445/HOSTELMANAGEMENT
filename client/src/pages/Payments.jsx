@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import PaymentService from '../services/paymentService';
 import { format } from 'date-fns';
 import { FileText, Plus, Download } from 'lucide-react';
 import { exportToCSV } from '../utils/exportToCSV';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import Loader from '../components/Loader';
+import socket from '../socket';
 
 const Payments = () => {
   const [payments, setPayments] = useState([]);
@@ -14,13 +15,14 @@ const Payments = () => {
   const [loading, setLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [formData, setFormData] = useState({ paymentMode: 'UPI' });
+  const [searchName, setSearchName] = useState('');
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [filterMonth, setFilterMonth] = useState('All');
 
   const fetchPayments = async () => {
     try {
-      const token = JSON.parse(localStorage.getItem('userInfo')).token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get('https://hostelmanagement-rss4.onrender.com/api/payments', config);
-      setPayments(data);
+      const result = await PaymentService.getAll({ limit: 500 });
+      setPayments(result.data || result);
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -30,6 +32,25 @@ const Payments = () => {
 
   useEffect(() => {
     fetchPayments();
+
+    // Real-time: connect socket and join owner room
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    if (userInfo) {
+      socket.connect();
+      socket.emit('join-owner', userInfo._id);
+
+      socket.on('payment-updated', (updatedPayment) => {
+        setPayments(prev =>
+          prev.map(p => p._id === updatedPayment._id ? updatedPayment : p)
+        );
+        toast.success(`💰 ${updatedPayment.tenant?.name || 'Tenant'} just paid rent!`, { icon: '🔔' });
+      });
+    }
+
+    return () => {
+      socket.off('payment-updated');
+      socket.disconnect();
+    };
   }, []);
 
   const handleGenerateRent = () => {
@@ -49,9 +70,7 @@ const Payments = () => {
               toast.dismiss(t.id);
               setIsGenerating(true);
               try {
-                const token = JSON.parse(localStorage.getItem('userInfo')).token;
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-                const { data } = await axios.post('https://hostelmanagement-rss4.onrender.com/api/payments/generate', {}, config);
+                const data = await PaymentService.generateRent();
                 toast.success(data.message);
                 fetchPayments();
               } catch (error) {
@@ -70,11 +89,7 @@ const Payments = () => {
   const handleMarkPaid = async (e) => {
     e.preventDefault();
     try {
-      const token = JSON.parse(localStorage.getItem('userInfo')).token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`https://hostelmanagement-rss4.onrender.com/api/payments/${selectedPayment._id}/pay`, {
-        paymentMode: formData.paymentMode
-      }, config);
+      await PaymentService.markPaid(selectedPayment._id, formData.paymentMode);
       setShowModal(false);
       toast.success('Payment marked as paid successfully!');
       fetchPayments();
@@ -137,22 +152,6 @@ const Payments = () => {
           </motion.button>
           <motion.button 
             whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
-            onClick={async () => {
-              try {
-                const token = JSON.parse(localStorage.getItem('userInfo')).token;
-                await axios.post('https://hostelmanagement-rss4.onrender.com/api/payments/test-overdue', {}, { headers: { Authorization: `Bearer ${token}` } });
-                toast.success('Overdue check completed! Refreshing data...');
-                fetchData();
-              } catch (e) {
-                toast.error('Failed to run overdue check');
-              }
-            }}
-            className="flex-1 sm:flex-none justify-center flex items-center px-4 py-2.5 bg-yellow-50 text-yellow-700 font-medium rounded-xl shadow-sm border border-yellow-200 hover:bg-yellow-100 transition-colors"
-          >
-            Test Overdue Check
-          </motion.button>
-          <motion.button 
-            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
             onClick={handleGenerateRent} 
             disabled={isGenerating}
             className={`flex-1 sm:flex-none justify-center flex items-center px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-xl shadow-sm hover:bg-indigo-700 transition-colors ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -160,6 +159,36 @@ const Payments = () => {
             <Plus size={20} className="mr-2" /> {isGenerating ? 'Generating...' : 'Generate Monthly Rent'}
           </motion.button>
         </div>
+      </div>
+
+      <div className="flex flex-wrap gap-4 mb-6">
+        <input 
+          type="text" 
+          placeholder="Search by tenant name..." 
+          className="p-2.5 border border-gray-200 text-gray-700 rounded-xl bg-white shadow-sm flex-1 min-w-[200px] outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
+        />
+        <select 
+          className="p-2.5 border border-gray-200 text-gray-700 rounded-xl bg-white shadow-sm w-full sm:w-48 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer"
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+        >
+          <option value="All">All Statuses</option>
+          <option value="Paid">Paid</option>
+          <option value="Unpaid">Unpaid</option>
+          <option value="Overdue">Overdue</option>
+        </select>
+        <select 
+          className="p-2.5 border border-gray-200 text-gray-700 rounded-xl bg-white shadow-sm w-full sm:w-48 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer"
+          value={filterMonth}
+          onChange={(e) => setFilterMonth(e.target.value)}
+        >
+          <option value="All">All Months</option>
+          {Array.from(new Set(payments.map(p => p.monthString).filter(Boolean))).sort().reverse().map(m => (
+            <option key={m} value={m}>{m}</option>
+          ))}
+        </select>
       </div>
 
       <motion.div 
@@ -179,7 +208,14 @@ const Payments = () => {
             </tr>
           </thead>
           <tbody className="block md:table-row-group md:bg-white md:divide-y divide-gray-200 space-y-4 md:space-y-0 p-2 md:p-0">
-            {payments.map(payment => (
+            {payments
+              .filter(p => {
+                if (filterStatus !== 'All' && p.status !== filterStatus) return false;
+                if (filterMonth !== 'All' && p.monthString !== filterMonth) return false;
+                if (searchName && (!p.tenant?.name || !p.tenant.name.toLowerCase().includes(searchName.toLowerCase()))) return false;
+                return true;
+              })
+              .map(payment => (
               <tr key={payment._id} className={`block md:table-row transition-all duration-300 md:hover:bg-gray-50 bg-white border border-gray-100 md:border-none rounded-2xl md:rounded-none shadow-sm md:shadow-none overflow-hidden ${payment.status === 'Paid' ? 'md:bg-green-50' : 'md:bg-red-50 md:border-l-4 md:border-red-400'}`}>
                 {/* Mobile header color strip based on status */}
                 <div className={`md:hidden h-2 w-full ${payment.status === 'Paid' ? 'bg-green-400' : payment.status === 'Overdue' ? 'bg-red-400' : 'bg-yellow-400'}`}></div>
@@ -190,7 +226,7 @@ const Payments = () => {
                 </td>
                 <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
                   <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Room</span>
-                  <span className="px-2.5 py-1 text-xs font-bold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm text-right md:text-left">
+                  <span className="px-2.5 py-1 text-xs font-bold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm text-right md:text-left whitespace-nowrap">
                     Room {payment.room?.roomNumber || 'N/A'}
                   </span>
                 </td>

@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Settings = require('../models/Settings');
 const jwt = require('jsonwebtoken');
 
 const generateToken = (id) => {
@@ -6,16 +7,17 @@ const generateToken = (id) => {
 };
 
 exports.registerUser = async (req, res) => {
-  const { name, email, password, pgName } = req.body;
+  const { name, email, password, pgName, role } = req.body;
   try {
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: 'User already exists' });
 
     const user = await User.create({ name, email, password, pgName, role: 'owner', isApproved: false });
     if (user) {
-      res.status(201).json({ message: 'Registration successful! Your account is currently pending admin approval. You will be able to log in once approved.' });
+      await Settings.create({ owner: user._id });
+      return res.status(201).json({ message: 'Registration successful! Your account is currently pending admin approval.' });
     } else {
-      res.status(400).json({ message: 'Invalid user data' });
+      return res.status(400).json({ message: 'Invalid user data' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -30,12 +32,21 @@ exports.loginUser = async (req, res) => {
       if (!user.isApproved) {
         return res.status(403).json({ message: 'Your account is pending admin approval. Please wait for authorization before logging in.' });
       }
+      let tenantContext = {};
+      if (user.role === 'tenant') {
+        const Tenant = require('../models/Tenant');
+        const tenantRecord = await Tenant.findOne({ userAccount: user._id });
+        if (tenantRecord) {
+          tenantContext = { tenantId: tenantRecord._id, ownerId: tenantRecord.owner };
+        }
+      }
       res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
         pgName: user.pgName,
+        ...tenantContext,
         token: generateToken(user._id)
       });
     } else {

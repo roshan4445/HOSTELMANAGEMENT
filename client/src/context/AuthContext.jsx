@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import AuthService from '../services/authService';
 
 export const AuthContext = createContext();
 
@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const { data } = await axios.post('https://hostelmanagement-rss4.onrender.com/api/auth/login', { email, password });
+      const data = await AuthService.login(email, password);
       setUser(data);
       localStorage.setItem('userInfo', JSON.stringify(data));
       return { success: true };
@@ -26,9 +26,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password, pgName) => {
+  const register = async (name, email, password, pgName, role = 'owner') => {
     try {
-      const { data } = await axios.post('https://hostelmanagement-rss4.onrender.com/api/auth/register', { name, email, password, pgName });
+      const data = await AuthService.register(name, email, password, pgName, role);
       return { success: true, message: data.message };
     } catch (error) {
       return { success: false, error: error.response?.data?.message || 'Registration failed' };

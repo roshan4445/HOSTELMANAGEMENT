@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import DashboardService from '../services/dashboardService';
 import { AuthContext } from '../context/AuthContext';
 import { Users, Home, DollarSign, AlertCircle, Lightbulb, ArrowRight, Clock, AlertTriangle, FileText, CheckCircle2 } from 'lucide-react';
 import { AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -20,9 +20,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = JSON.parse(localStorage.getItem('userInfo')).token;
-        const config = { headers: { Authorization: `Bearer ${token}` } };
-        const { data } = await axios.get('https://hostelmanagement-rss4.onrender.com/api/dashboard', config);
+        const data = await DashboardService.getStats();
         setStats(data);
         setLoading(false);
       } catch (error) {

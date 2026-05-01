@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import AnnouncementService from '../services/announcementService';
 import { Megaphone, Plus, Trash2, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,9 +13,7 @@ const Announcements = () => {
 
   const fetchAnnouncements = async () => {
     try {
-      const token = JSON.parse(localStorage.getItem('userInfo')).token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get('https://hostelmanagement-rss4.onrender.com/api/announcements', config);
+      const data = await AnnouncementService.getAll();
       setAnnouncements(data);
       setLoading(false);
     } catch (error) {
@@ -32,9 +30,7 @@ const Announcements = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = JSON.parse(localStorage.getItem('userInfo')).token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('https://hostelmanagement-rss4.onrender.com/api/announcements', formData, config);
+      await AnnouncementService.create(formData);
       toast.success('Announcement posted successfully!');
       setShowModal(false);
       setFormData({ title: '', message: '', priority: 'Low' });
@@ -60,9 +56,7 @@ const Announcements = () => {
             onClick={async () => {
               toast.dismiss(t.id);
               try {
-                const token = JSON.parse(localStorage.getItem('userInfo')).token;
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-                await axios.delete(`https://hostelmanagement-rss4.onrender.com/api/announcements/${id}`, config);
+                await AnnouncementService.delete(id);
                 toast.success('Announcement deleted');
                 fetchAnnouncements();
               } catch (error) {

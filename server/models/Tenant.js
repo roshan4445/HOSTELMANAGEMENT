@@ -7,7 +7,7 @@ const tenantSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   email: { type: String },
   aadhaar: { type: String },
-  aadhaarImage: { type: String },
+  aadhaarImage: { type: String, required: true, select: false },
   moveInDate: { type: Date, required: true },
   moveOutDate: { type: Date },
   noticeGiven: { type: Boolean, default: false },
@@ -18,5 +18,9 @@ const tenantSchema = new mongoose.Schema({
   rentAmount: { type: Number, required: true },
   deposit: { type: Number, default: 0 }
 }, { timestamps: true });
+
+// Performance indexes
+tenantSchema.index({ owner: 1, status: 1 });
+tenantSchema.index({ userAccount: 1 });
 
 module.exports = mongoose.model('Tenant', tenantSchema);

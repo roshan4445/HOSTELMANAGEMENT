@@ -12,15 +12,27 @@ const protect = async (req, res, next) => {
       if (!req.user) {
         return res.status(401).json({ message: 'User no longer exists. Please log in again.' });
       }
-      next();
+      return next();
     } catch (error) {
-      res.status(401).json({ message: 'Not authorized, token failed' });
+      return res.status(401).json({ message: 'Not authorized, token failed' });
     }
   }
 
   if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token' });
+    return res.status(401).json({ message: 'Not authorized, no token' });
   }
 };
 
-module.exports = { protect };
+/**
+ * Role-based authorization middleware.
+ * Usage: router.post('/route', protect, requireRole('owner'), handler)
+ * Accepts one or more roles: requireRole('owner', 'admin')
+ */
+const requireRole = (...roles) => (req, res, next) => {
+  if (!req.user || !roles.includes(req.user.role)) {
+    return res.status(403).json({ message: 'Forbidden: insufficient permissions' });
+  }
+  next();
+};
+
+module.exports = { protect, requireRole };

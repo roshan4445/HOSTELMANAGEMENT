@@ -1,9 +1,21 @@
 const Room = require('../models/Room');
+const User = require('../models/User');
 
 exports.getRooms = async (req, res) => {
   try {
-    const rooms = await Room.find({ owner: req.user._id }).populate('occupants');
-    res.json(rooms);
+    const rooms = await Room.find({ owner: req.user._id }).limit(500).populate('occupants').lean();
+    
+    // Compute the status manually since .lean() strips Mongoose virtuals
+    const roomsWithStatus = rooms.map(room => {
+      const occupantsCount = room.occupants ? room.occupants.length : 0;
+      let status = 'Vacant';
+      if (occupantsCount > 0) {
+        status = occupantsCount >= room.capacity ? 'Occupied' : 'Partial';
+      }
+      return { ...room, status };
+    });
+
+    res.json(roomsWithStatus);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -29,14 +41,15 @@ exports.createRoom = async (req, res) => {
 exports.getPublicRooms = async (req, res) => {
   try {
     const { pgName } = req.params;
-    const User = require('../models/User');
-    const owner = await User.findOne({ pgName: new RegExp(`^${pgName}$`, 'i') });
+    // Escape special regex characters to prevent injection
+    const escapedPgName = pgName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const owner = await User.findOne({ pgName: new RegExp(`^${escapedPgName}$`, 'i') });
     
     if (!owner) return res.status(404).json({ message: 'PG not found' });
 
-    const rooms = await Room.find({ owner: owner._id })
+    const rooms = await Room.find({ owner: owner._id }).limit(500)
       .select('roomNumber type capacity floor rentAmount occupants upcomingVacancy')
-      .populate('occupants');
+      .populate('occupants').lean();
 
     const publicRooms = rooms.map(room => {
       const isFull = room.occupants.length >= room.capacity;

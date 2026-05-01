@@ -21,4 +21,7 @@ const announcementSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
+// Performance index
+announcementSchema.index({ owner: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Announcement', announcementSchema);

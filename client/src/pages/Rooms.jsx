@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import RoomService from '../services/roomService';
+import PaymentService from '../services/paymentService';
 import { Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Loader from '../components/Loader';
@@ -17,14 +18,12 @@ const Rooms = () => {
 
   const fetchRooms = async () => {
     try {
-      const token = JSON.parse(localStorage.getItem('userInfo')).token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const [roomsRes, paymentsRes] = await Promise.all([
-        axios.get('https://hostelmanagement-rss4.onrender.com/api/rooms', config),
-        axios.get('https://hostelmanagement-rss4.onrender.com/api/payments', config)
+      const [roomsData, paymentsResult] = await Promise.all([
+        RoomService.getAll(),
+        PaymentService.getAll({ limit: 500 })
       ]);
-      setRooms(roomsRes.data);
-      setPayments(paymentsRes.data);
+      setRooms(roomsData);
+      setPayments(paymentsResult.data || paymentsResult);
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -39,9 +38,7 @@ const Rooms = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = JSON.parse(localStorage.getItem('userInfo')).token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('https://hostelmanagement-rss4.onrender.com/api/rooms', formData, config);
+      await RoomService.create(formData);
       setShowModal(false);
       setFormData({ roomNumber: '', type: 'Non-AC', capacity: 1, rentAmount: '', floor: 1 });
       fetchRooms();
@@ -118,10 +115,9 @@ const Rooms = () => {
           onChange={(e) => setFilterFloor(e.target.value)}
         >
           <option value="All">All Floors</option>
-          <option value="1">Floor 1</option>
-          <option value="2">Floor 2</option>
-          <option value="3">Floor 3</option>
-          <option value="4">Floor 4</option>
+          {[...new Set(rooms.map(r => r.floor).filter(Boolean))].sort((a, b) => a - b).map(floor => (
+            <option key={floor} value={floor}>Floor {floor}</option>
+          ))}
         </select>
       </div>
 
