@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AnnouncementService from '../services/announcementService';
-import { Megaphone, Plus, Trash2, Clock } from 'lucide-react';
+import { Megaphone, Plus, Trash2, Clock, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -131,13 +131,22 @@ const Announcements = () => {
                     {announcement.priority} Priority
                   </span>
                 </div>
-                <button 
-                  onClick={() => handleDelete(announcement._id)}
-                  className="text-gray-400 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 p-1"
-                  title="Delete Announcement"
-                >
-                  <Trash2 size={18} />
-                </button>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => { toast('WhatsApp integration coming soon!', { icon: '💬' }); }}
+                    className="text-gray-400 hover:text-green-500 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 p-1"
+                    title="Send WhatsApp Notification"
+                  >
+                    <MessageCircle size={18} />
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(announcement._id)}
+                    className="text-gray-400 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 p-1"
+                    title="Delete Announcement"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </div>
               <p className="text-gray-600 mt-2 mb-4 whitespace-pre-wrap">{announcement.message}</p>
               <div className="flex items-center text-xs text-gray-400">

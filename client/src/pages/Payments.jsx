@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PaymentService from '../services/paymentService';
 import { format } from 'date-fns';
-import { FileText, Plus, Download } from 'lucide-react';
+import { FileText, Plus, Download, MessageCircle } from 'lucide-react';
 import { exportToCSV } from '../utils/exportToCSV';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -267,18 +267,33 @@ const Payments = () => {
                     )}
                   </div>
                 </td>
-                <td className="px-5 py-4 md:px-6 md:py-4 flex justify-center md:justify-start items-center md:table-cell bg-gray-50/50 md:bg-transparent">
-                  {payment.status !== 'Paid' ? (
-                    <motion.button 
-                      whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
-                      onClick={() => openPaymentModal(payment)} 
-                      className="w-full md:w-auto px-4 py-2 md:px-3 md:py-1.5 bg-emerald-50 text-emerald-700 font-bold text-sm md:text-xs border border-emerald-200 rounded-lg md:rounded-md hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
-                    >
-                      Mark Paid
-                    </motion.button>
-                  ) : (
-                    <span className="md:hidden text-xs font-bold text-green-600 uppercase">Payment Completed</span>
-                  )}
+                <td className="px-5 py-4 md:px-6 md:py-4 flex flex-col md:flex-row justify-center md:justify-start items-center gap-2 md:table-cell bg-gray-50/50 md:bg-transparent">
+                  <div className="flex gap-2 w-full md:w-auto">
+                    {payment.status !== 'Paid' ? (
+                      <motion.button 
+                        whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
+                        onClick={() => openPaymentModal(payment)} 
+                        className="flex-1 md:flex-none px-4 py-2 md:px-3 md:py-1.5 bg-emerald-50 text-emerald-700 font-bold text-sm md:text-xs border border-emerald-200 rounded-lg md:rounded-md hover:bg-emerald-600 hover:text-white transition-all shadow-sm whitespace-nowrap"
+                      >
+                        Mark Paid
+                      </motion.button>
+                    ) : (
+                      <span className="md:hidden text-xs font-bold text-green-600 uppercase w-full text-center py-2">Payment Completed</span>
+                    )}
+                    {payment.status !== 'Paid' && (
+                      <motion.button 
+                        whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
+                        onClick={() => {
+                          toast('WhatsApp integration coming soon!', { icon: '💬' });
+                        }} 
+                        className="flex-1 md:flex-none flex items-center justify-center px-4 py-2 md:px-3 md:py-1.5 bg-green-500 text-white font-bold text-sm md:text-xs border border-green-600 rounded-lg md:rounded-md hover:bg-green-600 transition-all shadow-sm"
+                        title="Send WhatsApp Reminder"
+                      >
+                        <MessageCircle size={14} className="md:mr-1" />
+                        <span className="hidden md:inline">Remind</span>
+                      </motion.button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
