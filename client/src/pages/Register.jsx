@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Languages } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -12,6 +13,11 @@ const Register = () => {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const { register } = useContext(AuthContext);
+  const { t, i18n } = useTranslation();
+
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === 'en' ? 'te' : 'en');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,8 +39,13 @@ const Register = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white/80 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-white/50">
         <div>
-          <h1 className="text-center text-4xl font-extrabold text-indigo-600 tracking-tight mb-2">StayFlow</h1>
-          <h2 className="text-center text-2xl font-bold text-gray-900">Create your account</h2>
+          <div className="flex justify-between items-center mb-2">
+            <h1 className="text-4xl font-extrabold text-indigo-600 tracking-tight">StayFlow</h1>
+            <button type="button" onClick={toggleLanguage} className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+              <Languages size={20} />
+            </button>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900">{t('auth.register')}</h2>
         </div>
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
           {error && <div className="p-3 bg-rose-50 border border-rose-200 text-rose-600 text-sm font-medium rounded-xl text-center">{error}</div>}
@@ -64,7 +75,7 @@ const Register = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Email address</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">{t('auth.email')}</label>
               <input
                 type="email"
                 required
@@ -75,7 +86,7 @@ const Register = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">{t('auth.password')}</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -101,7 +112,7 @@ const Register = () => {
               type="submit"
               className="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
             >
-              Create account
+              {t('auth.submitRegister')}
             </button>
           </div>
         </form>

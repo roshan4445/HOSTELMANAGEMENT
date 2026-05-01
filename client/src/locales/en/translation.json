@@ -1,0 +1,34 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "rooms": "Rooms",
+    "tenants": "Tenants",
+    "payments": "Payments",
+    "complaints": "Complaints",
+    "announcements": "Announcements",
+    "rent": "My Rent",
+    "alerts": "Alerts & Notices",
+    "logout": "Logout",
+    "language": "Language"
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "overview": "Here's your PG overview for today.",
+    "revenue": "Total Revenue",
+    "pending": "Pending Collections",
+    "activeTenants": "Active Tenants",
+    "occupancy": "Room Occupancy",
+    "recentActivity": "Recent Activity",
+    "actionCenter": "Action Center",
+    "unpaidRent": "Unpaid Rent",
+    "unresolvedComplaints": "Unresolved Complaints"
+  },
+  "auth": {
+    "login": "Sign in to your account",
+    "register": "Create your account",
+    "email": "Email address",
+    "password": "Password",
+    "submitLogin": "Sign in",
+    "submitRegister": "Create account"
+  }
+}

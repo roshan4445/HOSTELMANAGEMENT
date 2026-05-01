@@ -3,17 +3,24 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Home, Users, DollarSign, LogOut, Megaphone, AlertCircle } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const { logout, user } = useContext(AuthContext);
+  const { t, i18n } = useTranslation();
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'en' ? 'te' : 'en';
+    i18n.changeLanguage(newLang);
+  };
 
   const links = [
-    { to: '/', icon: <LayoutDashboard size={20} />, text: 'Dashboard' },
-    { to: '/rooms', icon: <Home size={20} />, text: 'Rooms' },
-    { to: '/tenants', icon: <Users size={20} />, text: 'Tenants' },
-    { to: '/payments', icon: <DollarSign size={20} />, text: 'Payments' },
-    { to: '/complaints', icon: <AlertCircle size={20} />, text: 'Complaints' },
-    { to: '/announcements', icon: <Megaphone size={20} />, text: 'Announcements' },
+    { to: '/', icon: <LayoutDashboard size={20} />, text: t('sidebar.dashboard') },
+    { to: '/rooms', icon: <Home size={20} />, text: t('sidebar.rooms') },
+    { to: '/tenants', icon: <Users size={20} />, text: t('sidebar.tenants') },
+    { to: '/payments', icon: <DollarSign size={20} />, text: t('sidebar.payments') },
+    { to: '/complaints', icon: <AlertCircle size={20} />, text: t('sidebar.complaints') },
+    { to: '/announcements', icon: <Megaphone size={20} />, text: t('sidebar.announcements') },
   ];
 
   return (
@@ -49,7 +56,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           ))}
         </nav>
       </div>
-      <div className="p-6 border-t border-gray-100">
+      <div className="p-6 border-t border-gray-100 flex flex-col gap-4">
+        <button 
+          onClick={toggleLanguage}
+          className="flex items-center justify-center w-full px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg font-semibold text-sm hover:bg-indigo-100 transition-colors"
+        >
+          {i18n.language === 'en' ? 'తెలుగుకు మార్చండి (Telugu)' : 'Switch to English'}
+        </button>
         <motion.button
           whileHover={{ scale: 1.02, x: 5 }}
           whileTap={{ scale: 0.98 }}
@@ -57,7 +70,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           className="flex items-center text-gray-500 hover:text-rose-500 font-semibold transition-colors w-full"
         >
           <LogOut size={20} className="mr-3" />
-          Logout
+          {t('sidebar.logout')}
         </motion.button>
       </div>
     </div>

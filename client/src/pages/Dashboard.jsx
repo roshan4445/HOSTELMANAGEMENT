@@ -5,10 +5,12 @@ import { Users, Home, DollarSign, AlertCircle, Lightbulb, ArrowRight, Clock, Ale
 import { AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
+  const { t } = useTranslation();
   const [stats, setStats] = useState({ 
     totalRooms: 0, occupiedRooms: 0, activeTenants: 0, monthlyRevenue: 0,
     pendingRevenueAmount: 0, totalExpectedRevenue: 0, unpaidRentsCount: 0,
@@ -56,10 +58,12 @@ const Dashboard = () => {
       transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       className="space-y-8 pb-10"
     >
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Overview</h1>
-          <p className="text-gray-500 mt-1">Welcome back, {user?.name}. Here's what's happening today.</p>
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+            {t('dashboard.welcome')}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-emerald-500">{user?.name}</span> 👋
+          </h1>
+          <p className="text-gray-500 mt-2 font-medium">{t('dashboard.overview')}</p>
         </div>
       </div>
       
@@ -108,10 +112,10 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Total Rooms" value={stats.totalRooms} icon={<Home size={24} className="text-indigo-600" />} iconBg="bg-indigo-50 border border-indigo-100" delay={0.1} />
-        <StatCard title="Active Tenants" value={stats.activeTenants} icon={<Users size={24} className="text-emerald-600" />} iconBg="bg-emerald-50 border border-emerald-100" delay={0.2} />
-        <StatCard title="Monthly Revenue" value={`₹${stats.monthlyRevenue}`} icon={<DollarSign size={24} className="text-indigo-600" />} iconBg="bg-indigo-50 border border-indigo-100" delay={0.3} />
-        <StatCard title="Pending Revenue" value={`₹${stats.pendingRevenueAmount}`} icon={<DollarSign size={24} className="text-rose-600" />} iconBg="bg-rose-50 border border-rose-100" delay={0.4} />
+        <StatCard title={t('sidebar.rooms')} value={stats.totalRooms} icon={<Home size={24} className="text-indigo-600" />} iconBg="bg-indigo-50 border border-indigo-100" delay={0.1} />
+        <StatCard title={t('dashboard.activeTenants')} value={stats.activeTenants} icon={<Users size={24} className="text-emerald-600" />} iconBg="bg-emerald-50 border border-emerald-100" delay={0.2} />
+        <StatCard title={t('dashboard.revenue')} value={`₹${stats.monthlyRevenue}`} icon={<DollarSign size={24} className="text-indigo-600" />} iconBg="bg-indigo-50 border border-indigo-100" delay={0.3} />
+        <StatCard title={t('dashboard.pending')} value={`₹${stats.pendingRevenueAmount}`} icon={<DollarSign size={24} className="text-rose-600" />} iconBg="bg-rose-50 border border-rose-100" delay={0.4} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -148,7 +152,7 @@ const Dashboard = () => {
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
               className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col group"
             >
-              <h2 className="text-lg font-bold text-gray-900 mb-6">Room Occupancy</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-6">{t('dashboard.occupancy') || 'Room Occupancy'}</h2>
               <div className="h-[250px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>

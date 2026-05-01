@@ -1,0 +1,34 @@
+{
+  "sidebar": {
+    "dashboard": "డ్యాష్‌బోర్డ్",
+    "rooms": "గదులు",
+    "tenants": "అద్దెదారులు",
+    "payments": "చెల్లింపులు",
+    "complaints": "ఫిర్యాదులు",
+    "announcements": "ప్రకటనలు",
+    "rent": "నా అద్దె",
+    "alerts": "హెచ్చరికలు & నోటీసులు",
+    "logout": "లాగ్అవుట్",
+    "language": "భాష"
+  },
+  "dashboard": {
+    "welcome": "తిరిగి స్వాగతం",
+    "overview": "ఈరోజు మీ పీజీ యొక్క అవలోకనం ఇక్కడ ఉంది.",
+    "revenue": "మొత్తం ఆదాయం",
+    "pending": "పెండింగ్ వసూళ్లు",
+    "activeTenants": "క్రియాశీల అద్దెదారులు",
+    "occupancy": "గదుల ఆక్యుపెన్సీ",
+    "recentActivity": "ఇటీవలి చర్యలు",
+    "actionCenter": "యాక్షన్ సెంటర్",
+    "unpaidRent": "చెల్లించని అద్దె",
+    "unresolvedComplaints": "పరిష్కరించని ఫిర్యాదులు"
+  },
+  "auth": {
+    "login": "మీ ఖాతాకు సైన్ ఇన్ చేయండి",
+    "register": "మీ ఖాతాను సృష్టించండి",
+    "email": "ఇమెయిల్ చిరునామా",
+    "password": "పాస్వర్డ్",
+    "submitLogin": "సైన్ ఇన్ చేయండి",
+    "submitRegister": "ఖాతా సృష్టించండి"
+  }
+}
