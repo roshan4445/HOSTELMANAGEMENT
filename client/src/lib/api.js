@@ -2,7 +2,7 @@ import axios from 'axios';
 
 /**
  * Centralized Axios instance.
- * - Base URL from environment variable (falls back to localhost for dev)
+ * - Base URL from environment variable
  * - Auto-attaches JWT token from localStorage to every request
  * - Single place to change API URL for deployment
  */
