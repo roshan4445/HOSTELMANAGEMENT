@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import DashboardService from '../services/dashboardService';
 import { AuthContext } from '../context/AuthContext';
-import { Users, Home, DollarSign, AlertCircle, Lightbulb, ArrowRight, Clock, AlertTriangle, FileText, CheckCircle2 } from 'lucide-react';
+import { Users, Home, DollarSign, AlertCircle, Lightbulb, ArrowRight, Clock, AlertTriangle, FileText, CheckCircle2, Megaphone } from 'lucide-react';
 import { AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -67,199 +67,237 @@ const Dashboard = () => {
         </div>
       </div>
       
-      {/* 1. ACTION CENTER */}
+      {/* 1. MONEY CARDS (Top) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard title={t('dashboard.revenue')} value={`₹${stats.monthlyRevenue}`} icon={<DollarSign size={24} className="text-indigo-600" />} iconBg="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800/50" delay={0.1} />
+        <StatCard title={t('dashboard.pending')} value={`₹${stats.pendingRevenueAmount}`} icon={<DollarSign size={24} className="text-rose-600" />} iconBg="bg-rose-50 dark:bg-rose-900/30 border border-rose-100 dark:border-rose-800/50" delay={0.2} />
+        <StatCard title={t('sidebar.rooms')} value={stats.totalRooms} icon={<Home size={24} className="text-indigo-600" />} iconBg="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800/50" delay={0.3} />
+        <StatCard title={t('dashboard.activeTenants')} value={stats.activeTenants} icon={<Users size={24} className="text-emerald-600" />} iconBg="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800/50" delay={0.4} />
+      </div>
+
+      {/* 2. UNPAID TENANTS & ALERTS (Immediately below) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {stats.unpaidRentsCount > 0 && (
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-rose-50/80 border border-rose-200 rounded-2xl p-5 flex flex-col justify-between">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-rose-50/80 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/30 rounded-3xl p-5 flex flex-col justify-between">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-rose-100 rounded-lg text-rose-600"><AlertTriangle size={20} /></div>
-              <h3 className="font-bold text-rose-900">Unpaid Rents</h3>
+              <div className="p-2 bg-rose-100 dark:bg-rose-500/20 rounded-xl text-rose-600 dark:text-rose-400"><AlertTriangle size={20} /></div>
+              <h3 className="font-bold text-rose-900 dark:text-rose-100">Unpaid Rents</h3>
             </div>
-            <p className="text-sm text-rose-700 mb-4">You have <strong className="font-extrabold">{stats.unpaidRentsCount}</strong> pending rent payments totaling <strong className="font-extrabold">₹{stats.pendingRevenueAmount}</strong>.</p>
-            <Link to="/payments" className="text-sm font-bold text-rose-700 hover:text-rose-800 flex items-center group">
+            <p className="text-sm text-rose-700 dark:text-rose-300 mb-4">You have <strong className="font-extrabold">{stats.unpaidRentsCount}</strong> pending rent payments totaling <strong className="font-extrabold">₹{stats.pendingRevenueAmount}</strong>.</p>
+            <Link to="/payments" className="text-sm font-bold text-rose-700 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 flex items-center group mt-auto">
               Follow up now <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>
         )}
 
         {stats.pendingComplaintsCount > 0 && (
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-amber-50/80 border border-amber-200 rounded-2xl p-5 flex flex-col justify-between">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-amber-50/80 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 rounded-3xl p-5 flex flex-col justify-between">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-amber-100 rounded-lg text-amber-600"><AlertCircle size={20} /></div>
-              <h3 className="font-bold text-amber-900">Pending Complaints</h3>
+              <div className="p-2 bg-amber-100 dark:bg-amber-500/20 rounded-xl text-amber-600 dark:text-amber-400"><AlertCircle size={20} /></div>
+              <h3 className="font-bold text-amber-900 dark:text-amber-100">Pending Complaints</h3>
             </div>
-            <p className="text-sm text-amber-700 mb-4"><strong className="font-extrabold">{stats.pendingComplaintsCount}</strong> unresolved complaints require your immediate attention.</p>
-            <Link to="/complaints" className="text-sm font-bold text-amber-700 hover:text-amber-800 flex items-center group">
+            <p className="text-sm text-amber-700 dark:text-amber-300 mb-4"><strong className="font-extrabold">{stats.pendingComplaintsCount}</strong> unresolved complaints require your immediate attention.</p>
+            <Link to="/complaints" className="text-sm font-bold text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 flex items-center group mt-auto">
               View complaints <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>
         )}
 
-        {/* 2. COLLECTION PROGRESS */}
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-gray-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm md:col-span-1 flex flex-col justify-center">
-          <div className="flex justify-between items-end mb-2">
+        {/* COLLECTION PROGRESS */}
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-gray-200 dark:border-slate-700/50 rounded-3xl p-5 shadow-sm md:col-span-1 flex flex-col justify-center">
+          <div className="flex justify-between items-end mb-3">
             <h3 className="font-bold text-gray-900 dark:text-white">Monthly Collection</h3>
-            <span className="text-2xl font-black text-indigo-600">{collectionPercentage}%</span>
+            <span className="text-3xl font-black text-indigo-600 dark:text-indigo-400">{collectionPercentage}%</span>
           </div>
-          <div className="w-full bg-gray-100 dark:bg-slate-800/50 rounded-full h-3 mb-2 overflow-hidden">
+          <div className="w-full bg-gray-100 dark:bg-slate-700/50 rounded-full h-4 mb-3 overflow-hidden shadow-inner">
             <motion.div 
               initial={{ width: 0 }} animate={{ width: `${collectionPercentage}%` }} transition={{ duration: 1, ease: "easeOut" }}
-              className={`h-3 rounded-full ${collectionPercentage === 100 ? 'bg-emerald-500' : 'bg-indigo-500'}`}
+              className={`h-4 rounded-full ${collectionPercentage === 100 ? 'bg-emerald-500' : 'bg-gradient-to-r from-indigo-500 to-violet-500'}`}
             ></motion.div>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 font-medium text-right">₹{stats.monthlyRevenue} collected of ₹{stats.totalExpectedRevenue}</p>
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title={t('sidebar.rooms')} value={stats.totalRooms} icon={<Home size={24} className="text-indigo-600" />} iconBg="bg-indigo-50 border border-indigo-100" delay={0.1} />
-        <StatCard title={t('dashboard.activeTenants')} value={stats.activeTenants} icon={<Users size={24} className="text-emerald-600" />} iconBg="bg-emerald-50 border border-emerald-100" delay={0.2} />
-        <StatCard title={t('dashboard.revenue')} value={`₹${stats.monthlyRevenue}`} icon={<DollarSign size={24} className="text-indigo-600" />} iconBg="bg-indigo-50 border border-indigo-100" delay={0.3} />
-        <StatCard title={t('dashboard.pending')} value={`₹${stats.pendingRevenueAmount}`} icon={<DollarSign size={24} className="text-rose-600" />} iconBg="bg-rose-50 border border-rose-100" delay={0.4} />
+      {/* 3. QUICK ACTIONS */}
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
+        className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700/50"
+      >
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2"><span className="text-xl">⚡</span> Quick Actions</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Link to="/tenants" className="flex flex-col items-center justify-center p-5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 hover:shadow-md transition-all active:scale-95 group border border-indigo-100 dark:border-indigo-800/30">
+            <div className="p-3.5 bg-white dark:bg-slate-800 rounded-2xl shadow-sm mb-3 group-hover:scale-110 transition-transform">
+              <Users size={24} />
+            </div>
+            <span className="font-bold text-sm">Add Tenant</span>
+          </Link>
+          <Link to="/payments" className="flex flex-col items-center justify-center p-5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-2xl hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:shadow-md transition-all active:scale-95 group border border-emerald-100 dark:border-emerald-800/30">
+            <div className="p-3.5 bg-white dark:bg-slate-800 rounded-2xl shadow-sm mb-3 group-hover:scale-110 transition-transform">
+              <DollarSign size={24} />
+            </div>
+            <span className="font-bold text-sm">Collect Rent</span>
+          </Link>
+          <Link to="/rooms" className="flex flex-col items-center justify-center p-5 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-2xl hover:bg-amber-100 dark:hover:bg-amber-900/50 hover:shadow-md transition-all active:scale-95 group border border-amber-100 dark:border-amber-800/30">
+            <div className="p-3.5 bg-white dark:bg-slate-800 rounded-2xl shadow-sm mb-3 group-hover:scale-110 transition-transform">
+              <Home size={24} />
+            </div>
+            <span className="font-bold text-sm">Manage Rooms</span>
+          </Link>
+          <Link to="/announcements" className="flex flex-col items-center justify-center p-5 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-2xl hover:bg-purple-100 dark:hover:bg-purple-900/50 hover:shadow-md transition-all active:scale-95 group border border-purple-100 dark:border-purple-800/30">
+            <div className="p-3.5 bg-white dark:bg-slate-800 rounded-2xl shadow-sm mb-3 group-hover:scale-110 transition-transform">
+              <Megaphone size={24} />
+            </div>
+            <span className="font-bold text-sm">Announce</span>
+          </Link>
+        </div>
+      </motion.div>
+
+      {/* 4. RECENT ACTIVITY & INSIGHTS */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* RECENT ACTIVITY FEED */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}
+          className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-gray-100 dark:border-slate-700/50 rounded-3xl p-6 shadow-sm flex flex-col h-[400px]"
+        >
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2"><span className="text-xl">📜</span> Recent Activity</h2>
+          <div className="flex-1 overflow-y-auto pr-2 space-y-5 custom-scrollbar">
+            {stats.recentActivity?.length > 0 ? stats.recentActivity.map((activity, idx) => (
+              <div key={activity.id} className="flex gap-4 group">
+                <div className="flex flex-col items-center">
+                  <div className={`p-2.5 rounded-2xl ${activity.type === 'Payment' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'}`}>
+                    {activity.type === 'Payment' ? <DollarSign size={18} /> : <FileText size={18} />}
+                  </div>
+                  {idx !== stats.recentActivity.length - 1 && <div className="w-px h-full bg-gray-100 dark:bg-slate-700/50 mt-2"></div>}
+                </div>
+                <div className="pb-4 pt-1">
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white">{activity.title}</h4>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{activity.description}</p>
+                  <div className="flex items-center gap-1 mt-2 text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                    <Clock size={12} /> {format(new Date(activity.date), 'dd MMM, hh:mm a')}
+                  </div>
+                </div>
+              </div>
+            )) : (
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-10">No recent activity found.</p>
+            )}
+          </div>
+        </motion.div>
+
+        {/* KEY INSIGHTS */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.4 }}
+          className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-3xl p-6 shadow-md text-white flex flex-col h-[400px] border border-indigo-500/30"
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <Lightbulb size={24} className="text-indigo-200" />
+            <h2 className="text-xl font-bold">Key Insights</h2>
+          </div>
+          <ul className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+            {stats.roomStatusData?.find(r => r.name === 'Vacant')?.value > 0 && (
+              <li className="flex items-start gap-4 p-4 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                <div className="bg-indigo-500/80 p-2 rounded-xl mt-0.5"><Home size={18} /></div>
+                <p className="text-sm text-indigo-50 leading-relaxed">You have <strong className="text-white text-base">{stats.roomStatusData.find(r => r.name === 'Vacant').value} vacant rooms</strong>. Consider listing them on local directories to boost occupancy.</p>
+              </li>
+            )}
+            {stats.unpaidRentsCount > 0 && (
+              <li className="flex items-start gap-4 p-4 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                <div className="bg-rose-500/80 p-2 rounded-xl mt-0.5"><DollarSign size={18} /></div>
+                <p className="text-sm text-indigo-50 leading-relaxed">Follow up on <strong className="text-white text-base">{stats.unpaidRentsCount} unpaid rents</strong> to collect ₹{stats.pendingRevenueAmount} and reach 100% collection.</p>
+              </li>
+            )}
+            {stats.pendingComplaintsCount === 0 ? (
+              <li className="flex items-start gap-4 p-4 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                <div className="bg-emerald-500/80 p-2 rounded-xl mt-0.5"><CheckCircle2 size={18} /></div>
+                <p className="text-sm text-indigo-50 leading-relaxed">Great job! All tenant complaints have been resolved.</p>
+              </li>
+            ) : (
+              <li className="flex items-start gap-4 p-4 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                <div className="bg-amber-500/80 p-2 rounded-xl mt-0.5"><AlertCircle size={18} /></div>
+                <p className="text-sm text-indigo-50 leading-relaxed">Resolve the <strong className="text-white text-base">{stats.pendingComplaintsCount} pending complaints</strong> to improve tenant satisfaction.</p>
+              </li>
+            )}
+          </ul>
+        </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* 5. GRAPHS (LAST) */}
+      <div className="space-y-6 pt-6 mt-4 border-t border-gray-200/50 dark:border-slate-800">
+        <div className="flex items-center gap-2 px-2">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Analytics & Trends</h2>
+          <span className="px-2.5 py-1 bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 rounded-lg text-xs font-bold border border-gray-200 dark:border-slate-700">Optional</span>
+        </div>
         
-        <div className="lg:col-span-2 space-y-6">
-          {/* Revenue Trend Area Chart */}
+        {/* Revenue Trend Area Chart */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.5 }}
+          className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-6 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-700/50 flex flex-col group"
+        >
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Revenue Trend (6 Months)</h3>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={stats.revenueData}>
+                <defs>
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(156,163,175,0.2)" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} tickFormatter={(value) => `₹${value}`} dx={-10} />
+                <Tooltip contentStyle={{ borderRadius: '16px', border: '1px solid #f3f4f6', boxShadow: '0 10px 25px -5px rgb(0 0 0 / 0.1)', background: 'var(--tw-colors-white)' }} formatter={(value) => [`₹${value}`, 'Revenue']} />
+                <Area type="monotone" dataKey="revenue" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" activeDot={{ r: 6, strokeWidth: 0 }} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Room Occupancy Donut */}
           <motion.div 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}
-            className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-700/50 flex flex-col group"
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.6 }}
+            className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-6 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-700/50 flex flex-col group"
           >
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Revenue Trend (6 Months)</h2>
-            <div className="h-[300px] w-full">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">{t('dashboard.occupancy') || 'Room Occupancy'}</h3>
+            <div className="h-[250px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={stats.revenueData}>
-                  <defs>
-                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: 'currentColor', fontSize: 12}} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fill: 'currentColor', fontSize: 12}} tickFormatter={(value) => `₹${value}`} dx={-10} />
-                  <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #f3f4f6', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} formatter={(value) => [`₹${value}`, 'Revenue']} />
-                  <Area type="monotone" dataKey="revenue" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" activeDot={{ r: 6, strokeWidth: 0 }} />
-                </AreaChart>
+                <PieChart>
+                  <Pie data={stats.roomStatusData} innerRadius={65} outerRadius={85} paddingAngle={5} dataKey="value" stroke="none">
+                    {stats.roomStatusData?.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={roomColors[index % roomColors.length]} className="hover:opacity-80 transition-opacity" />
+                    ))}
+                  </Pie>
+                  <Tooltip cursor={{fill: 'transparent'}} contentStyle={{ borderRadius: '12px', border: '1px solid #f3f4f6', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                </PieChart>
               </ResponsiveContainer>
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Room Occupancy Donut */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-700/50 flex flex-col group"
-            >
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">{t('dashboard.occupancy') || 'Room Occupancy'}</h2>
-              <div className="h-[250px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={stats.roomStatusData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value" stroke="none">
-                      {stats.roomStatusData?.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={roomColors[index % roomColors.length]} className="hover:opacity-80 transition-opacity" />
-                      ))}
-                    </Pie>
-                    <Tooltip cursor={{fill: 'transparent'}} contentStyle={{ borderRadius: '12px', border: '1px solid #f3f4f6', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                    <Legend verticalAlign="bottom" height={36} iconType="circle" />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </motion.div>
-
-            {/* Payment Collection Donut */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.4 }}
-              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-700/50 flex flex-col group"
-            >
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Payment Status</h2>
-              <div className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={stats.paymentStatusData} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.1)" />
-                    <XAxis type="number" hide />
-                    <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontWeight: '600', fontSize: 13}} width={80} />
-                    <Tooltip cursor={{fill: '#f9fafb'}} contentStyle={{ borderRadius: '12px', border: '1px solid #f3f4f6', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                    <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={32}>
-                      {stats.paymentStatusData?.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={paymentColors[index % paymentColors.length]} className="hover:opacity-80 transition-opacity" />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          {/* 3. KEY INSIGHTS */}
+          {/* Payment Collection Bar */}
           <motion.div 
-            initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4, delay: 0.3 }}
-            className="bg-indigo-600 rounded-2xl p-6 shadow-md text-white"
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.7 }}
+            className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-6 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-700/50 flex flex-col group"
           >
-            <div className="flex items-center gap-2 mb-4">
-              <Lightbulb size={20} className="text-indigo-200" />
-              <h2 className="text-lg font-bold">Key Insights</h2>
-            </div>
-            <ul className="space-y-4">
-              {stats.roomStatusData?.find(r => r.name === 'Vacant')?.value > 0 && (
-                <li className="flex items-start gap-3">
-                  <div className="bg-indigo-500/50 p-1.5 rounded-md mt-0.5"><Home size={14} /></div>
-                  <p className="text-sm text-indigo-100 leading-tight">You have <strong>{stats.roomStatusData.find(r => r.name === 'Vacant').value} vacant rooms</strong>. Consider listing them on local directories to boost occupancy.</p>
-                </li>
-              )}
-              {stats.unpaidRentsCount > 0 && (
-                <li className="flex items-start gap-3">
-                  <div className="bg-indigo-500/50 p-1.5 rounded-md mt-0.5"><DollarSign size={14} /></div>
-                  <p className="text-sm text-indigo-100 leading-tight">Follow up on <strong>{stats.unpaidRentsCount} unpaid rents</strong> to collect ₹{stats.pendingRevenueAmount} and reach 100% collection.</p>
-                </li>
-              )}
-              {stats.pendingComplaintsCount === 0 ? (
-                <li className="flex items-start gap-3">
-                  <div className="bg-emerald-500/80 p-1.5 rounded-md mt-0.5"><CheckCircle2 size={14} /></div>
-                  <p className="text-sm text-indigo-100 leading-tight">Great job! All tenant complaints have been resolved.</p>
-                </li>
-              ) : (
-                <li className="flex items-start gap-3">
-                  <div className="bg-indigo-500/50 p-1.5 rounded-md mt-0.5"><AlertCircle size={14} /></div>
-                  <p className="text-sm text-indigo-100 leading-tight">Resolve the <strong>{stats.pendingComplaintsCount} pending complaints</strong> to improve tenant satisfaction.</p>
-                </li>
-              )}
-            </ul>
-          </motion.div>
-
-          {/* 4. RECENT ACTIVITY FEED */}
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4, delay: 0.4 }}
-            className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-gray-100 dark:border-slate-700/50 rounded-2xl p-6 shadow-sm flex flex-col h-[500px]"
-          >
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Recent Activity</h2>
-            <div className="flex-1 overflow-y-auto pr-2 space-y-5">
-              {stats.recentActivity?.length > 0 ? stats.recentActivity.map((activity, idx) => (
-                <div key={activity.id} className="flex gap-4 group">
-                  <div className="flex flex-col items-center">
-                    <div className={`p-2 rounded-full ${activity.type === 'Payment' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                      {activity.type === 'Payment' ? <DollarSign size={16} /> : <FileText size={16} />}
-                    </div>
-                    {idx !== stats.recentActivity.length - 1 && <div className="w-px h-full bg-gray-100 dark:bg-slate-800/50 mt-2"></div>}
-                  </div>
-                  <div className="pb-4">
-                    <h4 className="text-sm font-bold text-gray-900 dark:text-white">{activity.title}</h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{activity.description}</p>
-                    <div className="flex items-center gap-1 mt-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
-                      <Clock size={10} /> {format(new Date(activity.date), 'dd MMM, hh:mm a')}
-                    </div>
-                  </div>
-                </div>
-              )) : (
-                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-10">No recent activity found.</p>
-              )}
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Payment Status</h3>
+            <div className="h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats.paymentStatusData} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(156,163,175,0.2)" />
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontWeight: '600', fontSize: 13}} width={80} />
+                  <Tooltip cursor={{fill: 'rgba(0,0,0,0.05)'}} contentStyle={{ borderRadius: '12px', border: '1px solid #f3f4f6', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={32}>
+                    {stats.paymentStatusData?.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={paymentColors[index % paymentColors.length]} className="hover:opacity-80 transition-opacity" />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </motion.div>
         </div>
-
       </div>
     </motion.div>
   );
@@ -271,7 +309,7 @@ const StatCard = ({ title, value, icon, iconBg, delay }) => (
     animate={{ opacity: 1, y: 0 }} 
     transition={{ duration: 0.4, delay, ease: [0.25, 0.1, 0.25, 1] }}
     whileHover={{ y: -4, scale: 1.02 }}
-    className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-700/50 flex items-center justify-between group cursor-pointer"
+    className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-6 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-700/50 flex items-center justify-between group cursor-pointer"
   >
     <div className="relative z-10">
       <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">{title}</p>
@@ -282,7 +320,7 @@ const StatCard = ({ title, value, icon, iconBg, delay }) => (
         {value}
       </motion.h3>
     </div>
-    <div className={`p-3.5 rounded-xl shadow-sm relative z-10 ${iconBg} transform group-hover:scale-110 transition-transform duration-300`}>
+    <div className={`p-3.5 rounded-2xl shadow-sm relative z-10 ${iconBg} transform group-hover:scale-110 transition-transform duration-300`}>
       {icon}
     </div>
   </motion.div>
