@@ -53,8 +53,8 @@ const TenantComplaints = () => {
     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Complaints</h1>
-          <p className="text-sm text-gray-500 font-medium">Track and submit maintenance requests</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Complaints</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Track and submit maintenance requests</p>
         </div>
         <button 
           onClick={() => setShowModal(true)}
@@ -66,12 +66,12 @@ const TenantComplaints = () => {
 
       <div className="space-y-4">
         {complaints.map((complaint) => (
-          <div key={complaint._id} className={`p-5 rounded-3xl bg-white shadow-sm border ${
+          <div key={complaint._id} className={`p-5 rounded-3xl bg-white dark:bg-slate-800 shadow-sm border ${
             complaint.priority === 'High' ? 'border-rose-100' :
             complaint.priority === 'Medium' ? 'border-yellow-100' : 'border-green-100'
           }`}>
             <div className="flex justify-between items-start mb-2">
-              <h3 className="font-bold text-gray-800 text-lg">{complaint.title}</h3>
+              <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg">{complaint.title}</h3>
               <span className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
                 complaint.status === 'Resolved' ? 'bg-green-50 text-green-700' :
                 complaint.status === 'In Progress' ? 'bg-indigo-50 text-indigo-700' :
@@ -80,9 +80,9 @@ const TenantComplaints = () => {
                 {complaint.status}
               </span>
             </div>
-            <p className="text-sm text-gray-600 mb-4">{complaint.description}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{complaint.description}</p>
             <div className="flex items-center gap-3">
-              <span className="px-2.5 py-1 bg-gray-50 border border-gray-200 text-gray-600 rounded-lg text-xs font-semibold">
+              <span className="px-2.5 py-1 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 rounded-lg text-xs font-semibold">
                 {complaint.category}
               </span>
               <span className="flex items-center text-xs text-gray-400 font-medium">
@@ -92,9 +92,9 @@ const TenantComplaints = () => {
           </div>
         ))}
         {complaints.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-3xl border border-gray-100">
+          <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700/50">
              <MessageSquare size={40} className="mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-500 font-medium">No complaints raised yet.</p>
+            <p className="text-gray-500 dark:text-gray-400 font-medium">No complaints raised yet.</p>
           </div>
         )}
       </div>
@@ -106,22 +106,22 @@ const TenantComplaints = () => {
               initial={{ opacity: 0, y: 100 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 100 }}
-              className="bg-white p-6 rounded-3xl w-full max-w-md shadow-2xl pb-safe"
+              className="bg-white dark:bg-slate-800 p-6 rounded-3xl w-full max-w-md shadow-2xl pb-safe"
             >
-              <h2 className="text-xl font-bold mb-4 text-gray-800">Raise a Complaint</h2>
+              <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Raise a Complaint</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-1 ml-1">Title</label>
-                  <input required type="text" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/20" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="E.g. Leaking tap" />
+                  <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1 ml-1">Title</label>
+                  <input required type="text" className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/20" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="E.g. Leaking tap" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-1 ml-1">Description</label>
-                  <textarea required rows="3" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} placeholder="Describe the issue in detail..." />
+                  <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1 ml-1">Description</label>
+                  <textarea required rows="3" className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} placeholder="Describe the issue in detail..." />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase mb-1 ml-1">Category</label>
-                    <select className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/20" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1 ml-1">Category</label>
+                    <select className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/20" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
                       <option value="Electrical">Electrical</option>
                       <option value="Plumbing">Plumbing</option>
                       <option value="Cleaning">Cleaning</option>
@@ -129,8 +129,8 @@ const TenantComplaints = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase mb-1 ml-1">Priority</label>
-                    <select className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/20" value={formData.priority} onChange={e => setFormData({...formData, priority: e.target.value})}>
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1 ml-1">Priority</label>
+                    <select className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/20" value={formData.priority} onChange={e => setFormData({...formData, priority: e.target.value})}>
                       <option value="Low">Low</option>
                       <option value="Medium">Medium</option>
                       <option value="High">High</option>
@@ -138,7 +138,7 @@ const TenantComplaints = () => {
                   </div>
                 </div>
                 <div className="flex gap-3 pt-4">
-                  <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-3.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
+                  <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-3.5 bg-gray-100 dark:bg-slate-800/50 text-gray-700 dark:text-gray-200 font-bold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
                   <button type="submit" className="flex-1 py-3.5 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700 transition-colors">Submit</button>
                 </div>
               </form>

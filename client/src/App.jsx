@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthContext, AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Sidebar from './components/Sidebar';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -33,7 +34,7 @@ const ProtectedRoute = ({ children, requireRole }) => {
   }
   
   return (
-    <div className="flex bg-gradient-to-br from-gray-50 to-indigo-50 min-h-screen w-full overflow-x-hidden">
+    <div className="flex bg-gradient-to-br from-gray-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 min-h-screen w-full overflow-x-hidden transition-colors duration-300">
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black/20 z-40 lg:hidden backdrop-blur-sm transition-opacity"
@@ -44,9 +45,9 @@ const ProtectedRoute = ({ children, requireRole }) => {
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
       
       <div className="flex-1 lg:ml-64 w-full min-w-0 flex flex-col">
-        <div className="lg:hidden flex items-center justify-between p-4 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30">
-          <h1 className="text-xl font-bold text-indigo-600">StayFlow</h1>
-          <button onClick={() => setSidebarOpen(true)} className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+        <div className="lg:hidden flex items-center justify-between p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 sticky top-0 z-30">
+          <h1 className="text-xl font-bold text-indigo-600 dark:text-indigo-400">StayFlow</h1>
+          <button onClick={() => setSidebarOpen(true)} className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
             <Menu size={24} />
           </button>
         </div>
@@ -102,12 +103,14 @@ import { Toaster } from 'react-hot-toast';
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <Router>
-          <Toaster position="top-right" toastOptions={{ style: { borderRadius: '12px', background: '#333', color: '#fff' } }} />
-          <AppRoutes />
-        </Router>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <Router>
+            <Toaster position="top-right" toastOptions={{ style: { borderRadius: '12px', background: '#333', color: '#fff' } }} />
+            <AppRoutes />
+          </Router>
+        </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

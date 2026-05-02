@@ -77,35 +77,35 @@ const TenantAlerts = () => {
           <h2 className="text-xl font-bold flex items-center gap-2 mb-1"><AlertTriangle size={24} /> Planning to move out?</h2>
           <p className="text-yellow-100 text-sm font-medium">As per policy, a 15-day prior notice is mandatory.</p>
         </div>
-        <button onClick={() => setShowNoticeModal(true)} className="bg-white text-yellow-600 font-bold px-6 py-3 rounded-xl shadow-md w-full sm:w-auto hover:bg-yellow-50 transition-colors whitespace-nowrap">
+        <button onClick={() => setShowNoticeModal(true)} className="bg-white dark:bg-slate-800 text-yellow-600 font-bold px-6 py-3 rounded-xl shadow-md w-full sm:w-auto hover:bg-yellow-50 transition-colors whitespace-nowrap">
           Give Notice
         </button>
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2 mb-4">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-2 mb-4">
           <Megaphone className="text-indigo-600" /> Announcements
         </h1>
         
         <div className="space-y-4">
           {announcements.map((ann) => (
-            <div key={ann._id} className={`bg-white p-5 rounded-3xl shadow-sm border-l-4 ${
+            <div key={ann._id} className={`bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border-l-4 ${
               ann.priority === 'High' ? 'border-l-rose-500' :
               ann.priority === 'Medium' ? 'border-l-yellow-500' : 'border-l-indigo-500'
             }`}>
               <div className="flex justify-between items-start mb-2">
-                <h3 className="font-bold text-gray-800">{ann.title}</h3>
+                <h3 className="font-bold text-gray-800 dark:text-gray-100">{ann.title}</h3>
                 <span className="text-[10px] text-gray-400 font-bold whitespace-nowrap">
                   {new Date(ann.createdAt).toLocaleDateString()}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 leading-relaxed">{ann.message}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{ann.message}</p>
             </div>
           ))}
           {announcements.length === 0 && (
-            <div className="text-center py-10 bg-white rounded-3xl border border-gray-100">
+            <div className="text-center py-10 bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700/50">
                <Bell size={40} className="mx-auto text-gray-300 mb-3" />
-              <p className="text-gray-500 font-medium">No announcements from the PG owner.</p>
+              <p className="text-gray-500 dark:text-gray-400 font-medium">No announcements from the PG owner.</p>
             </div>
           )}
         </div>
@@ -118,17 +118,17 @@ const TenantAlerts = () => {
               initial={{ opacity: 0, y: 100 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 100 }}
-              className="bg-white p-6 rounded-3xl w-full max-w-md shadow-2xl pb-safe"
+              className="bg-white dark:bg-slate-800 p-6 rounded-3xl w-full max-w-md shadow-2xl pb-safe"
             >
-              <h2 className="text-xl font-bold mb-2 text-gray-800">Submit Move-out Notice</h2>
-              <p className="text-sm text-gray-500 mb-6">Select a date at least 15 days from today.</p>
+              <h2 className="text-xl font-bold mb-2 text-gray-800 dark:text-gray-100">Submit Move-out Notice</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Select a date at least 15 days from today.</p>
               <form onSubmit={handleGiveNotice} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-1 ml-1">Move-out Date</label>
-                  <input required type="date" min={minNoticeDateStr} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500/20" value={noticeDate} onChange={e => setNoticeDate(e.target.value)} />
+                  <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1 ml-1">Move-out Date</label>
+                  <input required type="date" min={minNoticeDateStr} className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-yellow-500/20" value={noticeDate} onChange={e => setNoticeDate(e.target.value)} />
                 </div>
                 <div className="flex gap-3 pt-4">
-                  <button type="button" onClick={() => setShowNoticeModal(false)} className="flex-1 py-3.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
+                  <button type="button" onClick={() => setShowNoticeModal(false)} className="flex-1 py-3.5 bg-gray-100 dark:bg-slate-800/50 text-gray-700 dark:text-gray-200 font-bold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
                   <button type="submit" className="flex-1 py-3.5 bg-yellow-500 text-white font-bold rounded-xl shadow-md hover:bg-yellow-600 transition-colors flex justify-center items-center gap-2">
                     Submit <Send size={16} />
                   </button>

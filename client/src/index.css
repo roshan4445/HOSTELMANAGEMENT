@@ -18,8 +18,13 @@
     --background: 248 250 252;
   }
 
+  .dark {
+    --surface: 15 23 42;
+    --background: 2 6 23;
+  }
+
   body {
-    @apply bg-slate-50 text-slate-900;
+    @apply bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50 transition-colors duration-300;
     font-family: 'Outfit', 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
@@ -27,15 +32,15 @@
 
 @layer components {
   .premium-card {
-    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-[0_8px_30px_rgb(0, 0, 0, 0.04)] rounded-2xl transition-all duration-300;
+    @apply bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-white/20 dark:border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl transition-all duration-300;
   }
 
   .premium-card:hover {
-    @apply shadow-[0_8px_30px_rgb(0, 0, 0, 0.08)] -translate-y-1;
+    @apply shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] -translate-y-1;
   }
 
   .glass-input {
-    @apply bg-white/50 backdrop-blur-sm border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 rounded-xl transition-all;
+    @apply bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-400/10 rounded-xl transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500;
   }
 
   .btn-primary {
@@ -43,7 +48,7 @@
   }
 
   .badge-premium {
-    @apply px-2.5 py-1 text-xs font-bold rounded-lg shadow-sm border;
+    @apply px-2.5 py-1 text-xs font-bold rounded-lg shadow-sm border dark:border-slate-600;
   }
 }
 

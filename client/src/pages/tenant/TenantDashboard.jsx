@@ -37,7 +37,7 @@ const TenantDashboard = () => {
   }
 
   if (!data || !data.tenant) {
-    return <div className="text-center mt-10 font-bold text-gray-500">Error loading dashboard</div>;
+    return <div className="text-center mt-10 font-bold text-gray-500 dark:text-gray-400">Error loading dashboard</div>;
   }
 
   const { tenant, currentPayment, alerts, room } = data;
@@ -85,7 +85,7 @@ const TenantDashboard = () => {
 
         <button 
           onClick={() => navigate('/rent')}
-          className="w-full bg-white text-indigo-600 font-bold py-3.5 rounded-xl shadow-md flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
+          className="w-full bg-white dark:bg-slate-800 text-indigo-600 font-bold py-3.5 rounded-xl shadow-md flex items-center justify-center gap-2 hover:bg-gray-50 dark:bg-slate-900/50 transition-colors"
         >
           {currentPayment?.status === 'Paid' ? 'View Receipt' : 'Pay Rent Now'} <ArrowRight size={18} />
         </button>
@@ -93,38 +93,38 @@ const TenantDashboard = () => {
 
       {/* Room Details & Quick Actions */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700/50">
           <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Room Info</p>
-          <p className="text-xl font-black text-gray-800">{room?.roomNumber || 'N/A'}</p>
-          <p className="text-xs text-gray-500 font-medium mt-1">{room?.type || 'Standard'} • Floor {room?.floor || 1}</p>
+          <p className="text-xl font-black text-gray-800 dark:text-gray-100">{room?.roomNumber || 'N/A'}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mt-1">{room?.type || 'Standard'} • Floor {room?.floor || 1}</p>
         </div>
-        <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700/50">
           <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Move In</p>
-          <p className="text-lg font-black text-gray-800">{format(new Date(tenant.moveInDate), 'dd MMM yyyy')}</p>
-          <p className="text-xs text-gray-500 font-medium mt-1">Deposit: ₹{tenant.deposit}</p>
+          <p className="text-lg font-black text-gray-800 dark:text-gray-100">{format(new Date(tenant.moveInDate), 'dd MMM yyyy')}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mt-1">Deposit: ₹{tenant.deposit}</p>
         </div>
       </div>
 
       {/* Actions */}
       <div>
-        <h3 className="text-lg font-bold text-gray-800 mb-4 px-1">Quick Actions</h3>
+        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 px-1">Quick Actions</h3>
         <div className="space-y-3">
-          <Link to="/complaints" className="flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+          <Link to="/complaints" className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all group">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-rose-50 text-rose-600 rounded-xl group-hover:scale-110 transition-transform"><MessageSquare size={20} /></div>
               <div>
-                <p className="font-bold text-gray-800">Raise Complaint</p>
-                <p className="text-xs text-gray-500 font-medium">Plumbing, electrical, etc.</p>
+                <p className="font-bold text-gray-800 dark:text-gray-100">Raise Complaint</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Plumbing, electrical, etc.</p>
               </div>
             </div>
             <ArrowRight size={20} className="text-gray-400 group-hover:text-rose-500 transition-colors" />
           </Link>
-          <button onClick={() => navigate('/alerts')} className="w-full flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+          <button onClick={() => navigate('/alerts')} className="w-full flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all group">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-yellow-50 text-yellow-600 rounded-xl group-hover:scale-110 transition-transform"><AlertTriangle size={20} /></div>
               <div className="text-left">
-                <p className="font-bold text-gray-800">Give Notice</p>
-                <p className="text-xs text-gray-500 font-medium">Plan your move out (15 days)</p>
+                <p className="font-bold text-gray-800 dark:text-gray-100">Give Notice</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Plan your move out (15 days)</p>
               </div>
             </div>
             <ArrowRight size={20} className="text-gray-400 group-hover:text-yellow-500 transition-colors" />

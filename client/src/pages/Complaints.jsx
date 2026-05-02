@@ -66,7 +66,7 @@ const Complaints = () => {
           <div className="h-10 bg-gray-200 rounded-lg w-48"></div>
           <div className="h-10 bg-gray-200 rounded-xl w-32"></div>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm h-[500px]"></div>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm h-[500px]"></div>
       </div>
     );
   }
@@ -82,12 +82,12 @@ const Complaints = () => {
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Complaints</h1>
-          <p className="text-gray-500 mt-1">Manage tenant maintenance requests synced from Google Forms.</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Complaints</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage tenant maintenance requests synced from Google Forms.</p>
         </div>
         
         <select 
-          className="p-2.5 border border-gray-200 text-gray-700 rounded-xl bg-white shadow-sm outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer w-full sm:w-auto"
+          className="p-2.5 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 rounded-xl bg-white dark:bg-slate-800 shadow-sm outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer w-full sm:w-auto"
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
@@ -100,12 +100,12 @@ const Complaints = () => {
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-        className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 p-6 overflow-hidden"
+        className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 dark:border-slate-700/50 p-6 overflow-hidden"
       >
         {filteredComplaints.length === 0 ? (
           <div className="text-center py-10">
             <AlertCircle size={48} className="mx-auto text-gray-300 mb-4" />
-            <p className="text-gray-500 font-medium">No complaints found.</p>
+            <p className="text-gray-500 dark:text-gray-400 font-medium">No complaints found.</p>
           </div>
         ) : (
           <motion.div 
@@ -118,7 +118,7 @@ const Complaints = () => {
                 whileHover={{ y: -2, scale: 1.005 }}
                 transition={{ duration: 0.2 }}
                 key={complaint._id} 
-                className={`p-5 rounded-xl border-l-[5px] shadow-sm hover:shadow-lg transition-all duration-300 bg-white/60 backdrop-blur-sm border border-gray-100 border-l-solid ${
+                className={`p-5 rounded-xl border-l-[5px] shadow-sm hover:shadow-lg transition-all duration-300 bg-white/60 backdrop-blur-sm border border-gray-100 dark:border-slate-700/50 border-l-solid ${
                   complaint.priority === 'High' ? 'border-l-red-500' :
                   complaint.priority === 'Medium' ? 'border-l-yellow-500' : 'border-l-green-500'
                 }`}
@@ -126,23 +126,23 @@ const Complaints = () => {
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
                   <div className="mb-4 lg:mb-0">
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                      <h3 className="text-lg font-bold text-gray-900">{complaint.title}</h3>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">{complaint.title}</h3>
                       <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold shadow-sm text-white ${
                         complaint.priority === 'High' ? 'bg-red-500' :
                         complaint.priority === 'Medium' ? 'bg-yellow-500' : 'bg-green-500'
                       }`}>
                         {complaint.priority} Priority
                       </span>
-                      <span className="px-2.5 py-0.5 bg-gray-100 border border-gray-200 text-gray-700 rounded-md text-xs font-semibold shadow-sm">
+                      <span className="px-2.5 py-0.5 bg-gray-100 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 rounded-md text-xs font-semibold shadow-sm">
                         {complaint.category}
                       </span>
                     </div>
                     
-                    <p className="text-gray-600 text-sm mb-3 max-w-3xl">{complaint.description}</p>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 max-w-3xl">{complaint.description}</p>
                     
-                    <div className="flex flex-wrap items-center text-xs text-gray-500 gap-3">
-                      <span><span className="font-semibold text-gray-700">Tenant:</span> {complaint.name} (Room {complaint.roomNumber})</span>
-                      <span><span className="font-semibold text-gray-700">Phone:</span> {complaint.phone || 'N/A'}</span>
+                    <div className="flex flex-wrap items-center text-xs text-gray-500 dark:text-gray-400 gap-3">
+                      <span><span className="font-semibold text-gray-700 dark:text-gray-200">Tenant:</span> {complaint.name} (Room {complaint.roomNumber})</span>
+                      <span><span className="font-semibold text-gray-700 dark:text-gray-200">Phone:</span> {complaint.phone || 'N/A'}</span>
                       <span className="flex items-center"><Clock size={12} className="mr-1"/> {format(new Date(complaint.createdAt), 'dd MMM yyyy, hh:mm a')}</span>
                     </div>
                   </div>

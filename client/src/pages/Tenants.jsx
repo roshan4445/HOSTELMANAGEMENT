@@ -104,10 +104,10 @@ const Tenants = () => {
   const handleMoveOut = (tenantId) => {
     toast((t) => (
       <div>
-        <p className="font-semibold text-gray-800">Are you sure you want to mark this tenant as moved out?</p>
+        <p className="font-semibold text-gray-800 dark:text-gray-100">Are you sure you want to mark this tenant as moved out?</p>
         <div className="flex justify-end gap-3 mt-4">
           <button 
-            className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors" 
+            className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-slate-800/50 hover:bg-gray-200 text-gray-700 dark:text-gray-200 rounded-lg font-medium transition-colors" 
             onClick={() => toast.dismiss(t.id)}
           >
             Cancel
@@ -164,7 +164,7 @@ const Tenants = () => {
           <div className="h-11 bg-gray-200 rounded-xl w-48"></div>
           <div className="h-11 bg-gray-200 rounded-xl w-48"></div>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm h-[500px]"></div>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm h-[500px]"></div>
       </div>
     );
   }
@@ -177,12 +177,12 @@ const Tenants = () => {
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Tenants</h1>
-          <p className="text-gray-500 mt-1">Manage active tenants and their details.</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Tenants</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage active tenants and their details.</p>
         </div>
         <div className="flex flex-wrap gap-3 w-full sm:w-auto">
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }} onClick={handleExport} className="flex-1 sm:flex-none items-center justify-center flex px-4 py-2.5 bg-white text-gray-700 font-medium rounded-xl shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors">
-            <Download size={20} className="mr-2 text-gray-500" /> Export CSV
+          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }} onClick={handleExport} className="flex-1 sm:flex-none items-center justify-center flex px-4 py-2.5 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-200 font-medium rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:bg-slate-900/50 transition-colors">
+            <Download size={20} className="mr-2 text-gray-500 dark:text-gray-400" /> Export CSV
           </motion.button>
           <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }} onClick={() => setShowModal(true)} className="flex-1 sm:flex-none items-center justify-center flex px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-xl shadow-sm hover:bg-indigo-700 transition-colors">
             <Plus size={20} className="mr-2" /> Add Tenant
@@ -194,12 +194,12 @@ const Tenants = () => {
         <input 
           type="text" 
           placeholder="Search by name..." 
-          className="p-2.5 border border-gray-200 text-gray-700 rounded-xl bg-white shadow-sm flex-1 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+          className="p-2.5 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 rounded-xl bg-white dark:bg-slate-800 shadow-sm flex-1 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
         />
         <select 
-          className="p-2.5 border border-gray-200 text-gray-700 rounded-xl bg-white shadow-sm w-48 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer"
+          className="p-2.5 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 rounded-xl bg-white dark:bg-slate-800 shadow-sm w-48 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer"
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
@@ -208,7 +208,7 @@ const Tenants = () => {
           <option value="MovedOut">Moved Out</option>
         </select>
         <select 
-          className="p-2.5 border border-gray-200 text-gray-700 rounded-xl bg-white shadow-sm w-48 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer"
+          className="p-2.5 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 rounded-xl bg-white dark:bg-slate-800 shadow-sm w-48 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer"
           value={filterFeeStatus}
           onChange={(e) => setFilterFeeStatus(e.target.value)}
         >
@@ -217,7 +217,7 @@ const Tenants = () => {
           <option value="Pending">Pending</option>
         </select>
         <select 
-          className="p-2.5 border border-gray-200 text-gray-700 rounded-xl bg-white shadow-sm w-48 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer"
+          className="p-2.5 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 rounded-xl bg-white dark:bg-slate-800 shadow-sm w-48 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer"
           value={filterFloor}
           onChange={(e) => setFilterFloor(e.target.value)}
         >
@@ -230,23 +230,23 @@ const Tenants = () => {
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-        className="bg-transparent md:bg-white/80 md:backdrop-blur-md rounded-none md:rounded-2xl md:shadow-sm md:hover:shadow-md transition-shadow md:border border-gray-100 md:overflow-hidden md:overflow-x-auto"
+        className="bg-transparent md:bg-white/80 dark:bg-slate-800/80 md:backdrop-blur-md rounded-none md:rounded-2xl md:shadow-sm md:hover:shadow-md transition-shadow md:border border-gray-100 dark:border-slate-700/50 md:overflow-hidden md:overflow-x-auto"
       >
         <table className="min-w-full block md:table border-collapse">
-          <thead className="hidden md:table-header-group bg-gray-50">
+          <thead className="hidden md:table-header-group bg-gray-50 dark:bg-slate-900/50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Move In</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Move Out</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rent/Dep</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fee Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contact</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Room</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Move In</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Move Out</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rent/Dep</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fee Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="block md:table-row-group md:bg-white md:divide-y divide-gray-200 space-y-4 md:space-y-0 p-2 md:p-0">
+          <tbody className="block md:table-row-group md:bg-white dark:bg-slate-800 md:divide-y divide-gray-200 space-y-4 md:space-y-0 p-2 md:p-0">
             {tenants.map(t => {
               const hasPaid = payments.find(p => p.tenant?._id === t._id && p.month === new Date().getMonth() + 1 && p.year === new Date().getFullYear());
               return { ...t, hasPaid };
@@ -260,7 +260,7 @@ const Tenants = () => {
               if (filterFloor !== 'All' && t.room?.floor !== Number(filterFloor)) return false;
               return true;
             }).map((tenant) => (
-              <tr key={tenant._id} className={`block md:table-row transition-all duration-300 md:hover:bg-gray-50 bg-white border border-gray-100 md:border-none rounded-2xl md:rounded-none shadow-sm md:shadow-none overflow-hidden group ${tenant.status === 'Active' ? 'md:bg-transparent' : 'md:bg-gray-50 opacity-75'}`}>
+              <tr key={tenant._id} className={`block md:table-row transition-all duration-300 md:hover:bg-gray-50 dark:bg-slate-900/50 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700/50 md:border-none rounded-2xl md:rounded-none shadow-sm md:shadow-none overflow-hidden group ${tenant.status === 'Active' ? 'md:bg-transparent' : 'md:bg-gray-50 dark:bg-slate-900/50 opacity-75'}`}>
                 {/* Mobile header color strip based on status */}
                 <div className={`md:hidden h-2 w-full ${tenant.status === 'Active' ? 'bg-green-400' : 'bg-red-400'}`}></div>
                 
@@ -270,50 +270,50 @@ const Tenants = () => {
                       {tenant.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="ml-4 flex-1">
-                      <div className="font-bold text-gray-900 text-base group-hover:text-indigo-600 transition-colors">{tenant.name}</div>
-                      <div className="md:hidden text-sm font-semibold text-gray-500">{tenant.phone}</div>
+                      <div className="font-bold text-gray-900 dark:text-white text-base group-hover:text-indigo-600 transition-colors">{tenant.name}</div>
+                      <div className="md:hidden text-sm font-semibold text-gray-500 dark:text-gray-400">{tenant.phone}</div>
                     </div>
                   </div>
                 </td>
                 <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none md:block hidden md:table-cell">
-                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Contact</span>
+                  <span className="md:hidden text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contact</span>
                   <div className="text-right md:text-left">
-                    <div className="text-sm font-semibold text-gray-800">{tenant.phone}</div>
-                    <div className="text-xs text-gray-500 mt-0.5">{tenant.email}</div>
+                    <div className="text-sm font-semibold text-gray-800 dark:text-gray-100">{tenant.phone}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{tenant.email}</div>
                   </div>
                 </td>
                 <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
-                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Room</span>
+                  <span className="md:hidden text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Room</span>
                   <div className="flex flex-col items-end md:items-start gap-1.5 whitespace-nowrap">
                     <span className="px-2.5 py-1 text-xs font-bold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm whitespace-nowrap">
                       Room {tenant.room?.roomNumber}
                     </span>
-                    <span className="px-2 py-0.5 text-[11px] font-semibold rounded-md bg-gray-100 text-gray-600 border border-gray-200 whitespace-nowrap">
+                    <span className="px-2 py-0.5 text-[11px] font-semibold rounded-md bg-gray-100 dark:bg-slate-800/50 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 whitespace-nowrap">
                       Floor {tenant.room?.floor || 1}
                     </span>
                   </div>
                 </td>
                 <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
-                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Move In</span>
-                  <span className="text-sm text-gray-800 font-medium">
+                  <span className="md:hidden text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Move In</span>
+                  <span className="text-sm text-gray-800 dark:text-gray-100 font-medium">
                     {format(new Date(tenant.moveInDate), 'dd MMM yyyy')}
                   </span>
                 </td>
                 <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
-                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Move Out</span>
-                  <span className="text-sm text-gray-800 font-medium">
+                  <span className="md:hidden text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Move Out</span>
+                  <span className="text-sm text-gray-800 dark:text-gray-100 font-medium">
                     {tenant.moveOutDate ? format(new Date(tenant.moveOutDate), 'dd MMM yyyy') : '-'}
                   </span>
                 </td>
                 <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
-                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Rent/Dep</span>
+                  <span className="md:hidden text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rent/Dep</span>
                   <div className="text-right md:text-left">
-                    <div className="text-sm font-bold text-gray-800">₹{tenant.rentAmount}</div>
-                    <div className="text-xs text-gray-500 font-medium mt-0.5">Dep: ₹{tenant.deposit || 0}</div>
+                    <div className="text-sm font-bold text-gray-800 dark:text-gray-100">₹{tenant.rentAmount}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">Dep: ₹{tenant.deposit || 0}</div>
                   </div>
                 </td>
                 <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
-                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Status</span>
+                  <span className="md:hidden text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</span>
                   <span className={`px-2.5 py-1 text-xs font-bold rounded-md shadow-sm text-white ${
                     tenant.status === 'Active' ? 'bg-green-500' : 'bg-red-500'
                   }`}>
@@ -321,7 +321,7 @@ const Tenants = () => {
                   </span>
                 </td>
                 <td className="px-5 py-3 md:px-6 md:py-4 flex justify-between items-center md:table-cell border-b border-gray-50 md:border-none">
-                  <span className="md:hidden text-xs font-bold text-gray-500 uppercase tracking-wider">Fee Status</span>
+                  <span className="md:hidden text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fee Status</span>
                   {tenant.status === 'Active' ? (
                     <span className={`px-2.5 py-1 text-xs font-bold rounded-md shadow-sm text-white ${
                       tenant.hasPaid ? 'bg-green-500' : 'bg-yellow-500'
@@ -332,7 +332,7 @@ const Tenants = () => {
                     <span className="text-gray-400 text-xs font-medium">-</span>
                   )}
                 </td>
-                <td className="px-5 py-4 md:px-6 md:py-4 flex flex-col sm:flex-row justify-center md:justify-start items-center md:table-cell bg-gray-50/50 md:bg-transparent">
+                <td className="px-5 py-4 md:px-6 md:py-4 flex flex-col sm:flex-row justify-center md:justify-start items-center md:table-cell bg-gray-50 dark:bg-slate-900/50/50 md:bg-transparent">
                   {tenant.status === 'Active' && (
                     <div className="flex gap-2 w-full justify-end md:justify-start">
                       {!tenant.noticeGiven ? (
@@ -372,32 +372,32 @@ const Tenants = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.2 }}
-              className="bg-white p-8 rounded-2xl w-[550px] my-auto shadow-xl"
+              className="bg-white dark:bg-slate-800 p-8 rounded-2xl w-[550px] my-auto shadow-xl"
             >
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-4">Add New Tenant</h2>
+              <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100 border-b pb-4">Add New Tenant</h2>
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">Name</label>
-                    <input required type="text" className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={e => setFormData({...formData, name: e.target.value})} />
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">Name</label>
+                    <input required type="text" className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-100 rounded-xl px-4 py-3 outline-none focus:bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={e => setFormData({...formData, name: e.target.value})} />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">Phone</label>
-                    <input required type="text" className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={e => setFormData({...formData, phone: e.target.value})} />
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">Phone</label>
+                    <input required type="text" className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-100 rounded-xl px-4 py-3 outline-none focus:bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={e => setFormData({...formData, phone: e.target.value})} />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">Email</label>
-                  <input type="email" className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={e => setFormData({...formData, email: e.target.value})} />
+                  <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">Email</label>
+                  <input type="email" className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-100 rounded-xl px-4 py-3 outline-none focus:bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={e => setFormData({...formData, email: e.target.value})} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">Move-in Date</label>
-                    <input required type="date" min={minDateStr} max={maxDateStr} className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={formData.moveInDate} onChange={e => setFormData({...formData, moveInDate: e.target.value})} />
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">Move-in Date</label>
+                    <input required type="date" min={minDateStr} max={maxDateStr} className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-100 rounded-xl px-4 py-3 outline-none focus:bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" value={formData.moveInDate} onChange={e => setFormData({...formData, moveInDate: e.target.value})} />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">Assign Room</label>
-                    <select required className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={e => {
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">Assign Room</label>
+                    <select required className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-100 rounded-xl px-4 py-3 outline-none focus:bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={e => {
                       const selectedRoom = rooms.find(r => r._id === e.target.value);
                       setFormData({...formData, roomId: e.target.value, rentAmount: selectedRoom ? selectedRoom.rentAmount : ''})
                     }}>
@@ -408,29 +408,29 @@ const Tenants = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">Rent Amount</label>
-                    <input required type="number" readOnly value={formData.rentAmount} className="w-full bg-gray-100 border border-gray-200 text-gray-600 rounded-xl px-4 py-3 outline-none cursor-not-allowed transition-all" placeholder="Auto-filled from room" />
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">Rent Amount</label>
+                    <input required type="number" readOnly value={formData.rentAmount} className="w-full bg-gray-100 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 rounded-xl px-4 py-3 outline-none cursor-not-allowed transition-all" placeholder="Auto-filled from room" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">Deposit / Advance</label>
-                    <input type="number" className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={e => setFormData({...formData, deposit: e.target.value})} />
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">Deposit / Advance</label>
+                    <input type="number" className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-100 rounded-xl px-4 py-3 outline-none focus:bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={e => setFormData({...formData, deposit: e.target.value})} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">Payment Method</label>
-                    <select className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={e => setFormData({...formData, paymentMethod: e.target.value})}>
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">Payment Method</label>
+                    <select className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-100 rounded-xl px-4 py-3 outline-none focus:bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={e => setFormData({...formData, paymentMethod: e.target.value})}>
                       <option value="UPI">UPI</option>
                       <option value="Cash">Cash</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">Aadhaar Card (Image) *</label>
-                    <input required type="file" accept="image/*" className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={handleFileChange} />
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">Aadhaar Card (Image) *</label>
+                    <input required type="file" accept="image/*" className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-100 rounded-xl px-4 py-3 outline-none focus:bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" onChange={handleFileChange} />
                   </div>
                 </div>
                 <div className="flex justify-end space-x-3 mt-8">
-                  <button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
+                  <button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 bg-gray-100 dark:bg-slate-800/50 text-gray-700 dark:text-gray-200 font-semibold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
                   <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" className="px-5 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl shadow-sm hover:bg-indigo-700 transition-colors">Save Tenant</motion.button>
                 </div>
               </form>
@@ -446,17 +446,17 @@ const Tenants = () => {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-white p-8 rounded-2xl w-[400px] shadow-xl"
+              className="bg-white dark:bg-slate-800 p-8 rounded-2xl w-[400px] shadow-xl"
             >
-              <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-4">Give 15-Day Notice</h2>
+              <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100 border-b pb-4">Give 15-Day Notice</h2>
               <form onSubmit={handleGiveNotice}>
                 <div className="mb-4">
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">Move-out Date</label>
-                  <input required type="date" min={minNoticeDateStr} className="w-full bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-all" value={noticeDate} onChange={e => setNoticeDate(e.target.value)} />
-                  <p className="text-xs text-gray-500 mt-2 ml-1">Must be at least 15 days from today.</p>
+                  <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">Move-out Date</label>
+                  <input required type="date" min={minNoticeDateStr} className="w-full bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-100 rounded-xl px-4 py-3 outline-none focus:bg-white dark:bg-slate-800 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-all" value={noticeDate} onChange={e => setNoticeDate(e.target.value)} />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 ml-1">Must be at least 15 days from today.</p>
                 </div>
                 <div className="flex justify-end space-x-3 mt-8">
-                  <button type="button" onClick={() => { setShowNoticeModal(false); setNoticeTenantId(null); setNoticeDate(''); }} className="px-5 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
+                  <button type="button" onClick={() => { setShowNoticeModal(false); setNoticeTenantId(null); setNoticeDate(''); }} className="px-5 py-2.5 bg-gray-100 dark:bg-slate-800/50 text-gray-700 dark:text-gray-200 font-semibold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
                   <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" className="px-5 py-2.5 bg-yellow-500 text-white font-semibold rounded-xl shadow-sm hover:bg-yellow-600 transition-colors">Submit Notice</motion.button>
                 </div>
               </form>

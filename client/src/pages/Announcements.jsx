@@ -43,10 +43,10 @@ const Announcements = () => {
   const handleDelete = (id) => {
     toast((t) => (
       <div>
-        <p className="font-semibold text-gray-800">Delete this announcement?</p>
+        <p className="font-semibold text-gray-800 dark:text-gray-100">Delete this announcement?</p>
         <div className="flex justify-end gap-3 mt-4">
           <button 
-            className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors" 
+            className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-slate-800/50 hover:bg-gray-200 text-gray-700 dark:text-gray-200 rounded-lg font-medium transition-colors" 
             onClick={() => toast.dismiss(t.id)}
           >
             Cancel
@@ -79,7 +79,7 @@ const Announcements = () => {
           <div className="h-10 bg-gray-200 rounded-xl w-32"></div>
         </div>
         <div className="space-y-4">
-          {[1,2,3].map(i => <div key={i} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm h-32"></div>)}
+          {[1,2,3].map(i => <div key={i} className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm h-32"></div>)}
         </div>
       </div>
     );
@@ -94,8 +94,8 @@ const Announcements = () => {
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Announcements</h1>
-          <p className="text-gray-500 mt-1">Broadcast important updates and notices to all tenants.</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Announcements</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Broadcast important updates and notices to all tenants.</p>
         </div>
         
         <motion.button 
@@ -109,21 +109,21 @@ const Announcements = () => {
 
       <div className="space-y-4">
         {announcements.length === 0 ? (
-          <div className="text-center py-12 bg-white/80 backdrop-blur-md rounded-2xl border border-gray-100 shadow-sm">
+          <div className="text-center py-12 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm">
             <Megaphone size={48} className="mx-auto text-gray-300 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900">No Announcements</h3>
-            <p className="text-gray-500">You haven't posted any announcements yet.</p>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">No Announcements</h3>
+            <p className="text-gray-500 dark:text-gray-400">You haven't posted any announcements yet.</p>
           </div>
         ) : (
           announcements.map((announcement, index) => (
             <motion.div
               key={announcement._id}
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 p-6 relative group"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 dark:border-slate-700/50 p-6 relative group"
             >
               <div className="flex justify-between items-start mb-2">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h3 className="text-xl font-bold text-gray-900">{announcement.title}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">{announcement.title}</h3>
                   <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold shadow-sm text-white ${
                     announcement.priority === 'High' ? 'bg-red-500' :
                     announcement.priority === 'Medium' ? 'bg-yellow-500' : 'bg-green-500'
@@ -148,7 +148,7 @@ const Announcements = () => {
                   </button>
                 </div>
               </div>
-              <p className="text-gray-600 mt-2 mb-4 whitespace-pre-wrap">{announcement.message}</p>
+              <p className="text-gray-600 dark:text-gray-300 mt-2 mb-4 whitespace-pre-wrap">{announcement.message}</p>
               <div className="flex items-center text-xs text-gray-400">
                 <Clock size={12} className="mr-1" />
                 Posted {format(new Date(announcement.createdAt), 'dd MMM yyyy, hh:mm a')}
@@ -168,19 +168,19 @@ const Announcements = () => {
             />
             <motion.div 
               initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden"
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden"
             >
-              <div className="p-6 border-b border-gray-100">
-                <h2 className="text-2xl font-bold text-gray-900 tracking-tight">New Announcement</h2>
+              <div className="p-6 border-b border-gray-100 dark:border-slate-700/50">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">New Announcement</h2>
               </div>
               
               <form onSubmit={handleSubmit} className="p-6">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Title</label>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Title</label>
                     <input 
                       type="text" required
-                      className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-gray-900 font-medium"
+                      className="w-full p-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-gray-900 dark:text-white font-medium"
                       value={formData.title}
                       onChange={e => setFormData({...formData, title: e.target.value})}
                       placeholder="E.g., Water Supply Disruption"
@@ -188,9 +188,9 @@ const Announcements = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Priority</label>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Priority</label>
                     <select 
-                      className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-gray-900 font-medium cursor-pointer"
+                      className="w-full p-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-gray-900 dark:text-white font-medium cursor-pointer"
                       value={formData.priority}
                       onChange={e => setFormData({...formData, priority: e.target.value})}
                     >
@@ -201,10 +201,10 @@ const Announcements = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Message</label>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Message</label>
                     <textarea 
                       required rows="4"
-                      className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-gray-900 font-medium resize-none"
+                      className="w-full p-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-gray-900 dark:text-white font-medium resize-none"
                       value={formData.message}
                       onChange={e => setFormData({...formData, message: e.target.value})}
                       placeholder="Write your announcement details here..."
@@ -216,7 +216,7 @@ const Announcements = () => {
                   <button 
                     type="button" 
                     onClick={() => setShowModal(false)}
-                    className="flex-1 py-2.5 border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                    className="flex-1 py-2.5 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 font-medium rounded-xl hover:bg-gray-50 dark:bg-slate-900/50 transition-colors"
                   >
                     Cancel
                   </button>

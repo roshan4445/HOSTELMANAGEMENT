@@ -8,7 +8,7 @@ const Loader = ({ text = "Loading your data..." }) => {
         <div className="absolute inset-0 bg-indigo-500 blur-xl opacity-50 rounded-full animate-pulse"></div>
         <Loader2 size={48} className="text-indigo-600 animate-spin relative z-10" />
       </div>
-      <p className="text-gray-500 font-medium tracking-wide animate-pulse">{text}</p>
+      <p className="text-gray-500 dark:text-gray-400 font-medium tracking-wide animate-pulse">{text}</p>
     </div>
   );
 };
