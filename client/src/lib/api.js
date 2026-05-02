@@ -7,7 +7,7 @@ import axios from 'axios';
  * - Single place to change API URL for deployment
  */
 const API = axios.create({
-  baseURL: 'https://hostelmanagement-rss4.onrender.com',
+  baseURL: 'http://localhost:5000',
 });
 
 // Request interceptor: auto-attach auth token

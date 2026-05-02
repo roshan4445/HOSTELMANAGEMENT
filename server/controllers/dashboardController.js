@@ -6,7 +6,10 @@ const Settings = require('../models/Settings');
 
 exports.getDashboardStats = async (req, res) => {
   try {
+    const mongoose = require('mongoose');
     const ownerId = req.user._id;
+    const ownerObjectId = new mongoose.Types.ObjectId(ownerId);
+    
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
 
@@ -23,12 +26,13 @@ exports.getDashboardStats = async (req, res) => {
       pendingComplaintsCount,
       revenueAgg,
       recentPayments,
-      recentComplaints
+      recentComplaints,
+      unpaidPayments
     ] = await Promise.all([
       Room.find({ owner: ownerId }).lean(),
       Tenant.countDocuments({ owner: ownerId, status: 'Active' }),
       Payment.aggregate([
-        { $match: { owner: ownerId, month: currentMonth, year: currentYear } },
+        { $match: { owner: ownerObjectId, month: currentMonth, year: currentYear } },
         { $group: {
             _id: "$status",
             totalAmount: { $sum: "$total" },
@@ -39,7 +43,7 @@ exports.getDashboardStats = async (req, res) => {
       Payment.aggregate([
         { 
           $match: { 
-            owner: ownerId, 
+            owner: ownerObjectId, 
             status: 'Paid',
             $or: [
               { year: { $gt: startYear } },
@@ -55,7 +59,13 @@ exports.getDashboardStats = async (req, res) => {
         }
       ]),
       Payment.find({ owner: ownerId }).sort({ updatedAt: -1 }).limit(5).populate('tenant', 'name').lean(),
-      Complaint.find({ owner: ownerId }).sort({ createdAt: -1 }).limit(5).lean()
+      Complaint.find({ owner: ownerId }).sort({ createdAt: -1 }).limit(5).lean(),
+      Payment.find({ 
+        owner: ownerId, 
+        month: currentMonth, 
+        year: currentYear, 
+        status: { $in: ['Unpaid', 'Overdue'] } 
+      }).populate('tenant', 'name contactPhone').populate('room', 'roomNumber').lean()
     ]);
 
     // Process room stats
@@ -121,6 +131,23 @@ exports.getDashboardStats = async (req, res) => {
     recentActivity.sort((a, b) => new Date(b.date) - new Date(a.date));
     recentActivity = recentActivity.slice(0, 5);
 
+    // Format Unpaid Tenants
+    const unpaidTenantsData = unpaidPayments.map(p => {
+      let daysLate = 0;
+      if (p.dueDate && new Date(p.dueDate) < new Date()) {
+        const diffTime = Math.abs(new Date() - new Date(p.dueDate));
+        daysLate = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      }
+      return {
+        id: p._id,
+        name: p.tenant?.name || 'Unknown',
+        room: p.room?.roomNumber || 'N/A',
+        amount: p.total,
+        daysLate: daysLate,
+        phone: p.tenant?.contactPhone || ''
+      };
+    });
+
     res.json({
       totalRooms,
       occupiedRooms: fullRooms + partialRooms,
@@ -140,7 +167,8 @@ exports.getDashboardStats = async (req, res) => {
         { name: 'Pending', value: pendingTenantsCount > 0 ? pendingTenantsCount : 0 }
       ],
       revenueData,
-      recentActivity
+      recentActivity,
+      unpaidTenants: unpaidTenantsData
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

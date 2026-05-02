@@ -162,7 +162,7 @@ const Rooms = () => {
             <div className="text-gray-600 dark:text-gray-300 space-y-2.5 text-sm">
               <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Type</span> <span className="font-semibold text-gray-900 dark:text-white">{room.type}</span></div>
               <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Floor</span> <span className="font-semibold text-gray-900 dark:text-white">{room.floor || 1}</span></div>
-              <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Capacity</span> <span className="font-semibold text-gray-900 dark:text-white">{room.occupants.length} / {room.capacity}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Occupancy</span> <span className="font-semibold text-gray-900 dark:text-white">{room.occupants.length} / {room.capacity}</span></div>
               <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Rent</span> <span className="font-semibold text-indigo-600">₹{room.rentAmount}</span></div>
             </div>
           </motion.div>
@@ -246,7 +246,7 @@ const Rooms = () => {
                   </span>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold mb-1">Capacity</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold mb-1">Occupancy</p>
                   <p className="font-semibold text-gray-800 dark:text-gray-100">{selectedRoom.occupants.length} / {selectedRoom.capacity}</p>
                 </div>
                 <div>

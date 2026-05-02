@@ -38,7 +38,29 @@ exports.createTenant = async (req, res) => {
       return res.status(400).json({ message: 'Move-in date must be within 10 days of the present date.' });
     }
 
-    // Force rentAmount to match the room's rentAmount
+    // Check for duplicate active tenant
+    const orConditions = [{ phone }];
+    if (email) orConditions.push({ email });
+    orConditions.push({ name: new RegExp(`^${name}$`, 'i') });
+
+    const duplicateTenant = await Tenant.findOne({
+      owner: req.user._id,
+      status: 'Active',
+      $or: orConditions
+    });
+
+    if (duplicateTenant) {
+      if (duplicateTenant.phone === phone) {
+        return res.status(400).json({ message: 'An active tenant with this phone number already exists in your PG.' });
+      }
+      if (email && duplicateTenant.email === email) {
+        return res.status(400).json({ message: 'An active tenant with this email already exists in your PG.' });
+      }
+      if (duplicateTenant.name.toLowerCase() === name.toLowerCase()) {
+        return res.status(400).json({ message: 'An active tenant with this exact full name already exists in your PG.' });
+      }
+    }
+
     const actualRentAmount = room.rentAmount;
 
     const tenant = await Tenant.create({
