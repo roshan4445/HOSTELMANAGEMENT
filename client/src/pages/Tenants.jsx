@@ -8,6 +8,7 @@ import { exportToCSV } from '../utils/exportToCSV';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import Loader from '../components/Loader';
+import axios from 'axios';
 
 const Tenants = () => {
   const [tenants, setTenants] = useState([]);
@@ -59,21 +60,47 @@ const Tenants = () => {
     fetchData();
   }, []);
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const data = new FormData();
       Object.keys(formData).forEach(key => {
         data.append(key, formData[key]);
       });
-      await TenantService.create(data);
+
+      const token = JSON.parse(localStorage.getItem('userInfo')).token;
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await axios.post(
+        'https://hostelmanagement-rss4.onrender.com/api/tenants', 
+        data, 
+        config
+      );
+      try {
+        await axios.post(
+          'https://proconscription-rifely-tiffaney.ngrok-free.dev/webhook/new-tenant-welcomeMsg', 
+          {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            roomId: formData.roomId,
+            rentAmount: formData.rentAmount,
+            moveInDate: formData.moveInDate,
+            deposit: formData.deposit
+          }
+        );
+        console.log('Welcome email sent!');
+      } catch (webhookError) {
+        console.log('Webhook failed:', webhookError);
+      }
+
       toast.success('Tenant added successfully!');
       setShowModal(false);
       fetchData();
+
     } catch (error) {
       toast.error(error.response?.data?.message || 'Error adding tenant');
     }
-  };
+};
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
