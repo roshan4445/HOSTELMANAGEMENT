@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AnnouncementService from '../services/announcementService';
-import { Megaphone, Plus, Trash2, Clock, MessageCircle } from 'lucide-react';
+import { Megaphone, Plus, Trash2, Clock, MessageCircle, Edit2, Eye, CalendarX2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -9,12 +9,14 @@ const Announcements = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ title: '', message: '', priority: 'Low' });
+  const [editMode, setEditMode] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [formData, setFormData] = useState({ title: '', message: '', priority: 'Low', expiresAt: '' });
 
   const fetchAnnouncements = async () => {
     try {
       const data = await AnnouncementService.getAll();
-      setAnnouncements(data);
+      setAnnouncements(data.announcements || data);
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -30,14 +32,41 @@ const Announcements = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await AnnouncementService.create(formData);
-      toast.success('Announcement posted successfully!');
-      setShowModal(false);
-      setFormData({ title: '', message: '', priority: 'Low' });
+      const payload = { ...formData };
+      if (!payload.expiresAt) delete payload.expiresAt;
+
+      if (editMode) {
+        await AnnouncementService.update(editId, payload);
+        toast.success('Announcement updated successfully!');
+      } else {
+        await AnnouncementService.create(payload);
+        toast.success('Announcement posted successfully!');
+      }
+      
+      handleCloseModal();
       fetchAnnouncements();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Error posting announcement');
+      toast.error(error.response?.data?.message || 'Error saving announcement');
     }
+  };
+
+  const handleOpenEdit = (ann) => {
+    setEditMode(true);
+    setEditId(ann._id);
+    setFormData({
+      title: ann.title,
+      message: ann.message,
+      priority: ann.priority,
+      expiresAt: ann.expiresAt ? new Date(ann.expiresAt).toISOString().split('T')[0] : ''
+    });
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setEditMode(false);
+    setEditId(null);
+    setFormData({ title: '', message: '', priority: 'Low', expiresAt: '' });
   };
 
   const handleDelete = (id) => {
@@ -100,7 +129,7 @@ const Announcements = () => {
         
         <motion.button 
           whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
-          onClick={() => setShowModal(true)} 
+          onClick={() => { handleCloseModal(); setShowModal(true); }} 
           className="flex items-center w-full sm:w-auto justify-center px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-xl shadow-sm hover:bg-indigo-700 transition-colors"
         >
           <Plus size={20} className="mr-2" /> New Announcement
@@ -130,8 +159,20 @@ const Announcements = () => {
                   }`}>
                     {announcement.priority} Priority
                   </span>
+                  {announcement.isExpired && (
+                    <span className="px-2.5 py-0.5 rounded-md text-xs font-bold shadow-sm bg-gray-500 text-white flex items-center gap-1">
+                      <CalendarX2 size={12} /> Expired
+                    </span>
+                  )}
                 </div>
                 <div className="flex gap-2">
+                  <button 
+                    onClick={() => handleOpenEdit(announcement)}
+                    className="text-gray-400 hover:text-indigo-500 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 p-1"
+                    title="Edit Announcement"
+                  >
+                    <Edit2 size={18} />
+                  </button>
                   <button 
                     onClick={() => { toast('WhatsApp integration coming soon!', { icon: '💬' }); }}
                     className="text-gray-400 hover:text-green-500 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 p-1"
@@ -149,9 +190,15 @@ const Announcements = () => {
                 </div>
               </div>
               <p className="text-gray-600 dark:text-gray-300 mt-2 mb-4 whitespace-pre-wrap">{announcement.message}</p>
-              <div className="flex items-center text-xs text-gray-400">
-                <Clock size={12} className="mr-1" />
-                Posted {format(new Date(announcement.createdAt), 'dd MMM yyyy, hh:mm a')}
+              <div className="flex items-center justify-between text-xs text-gray-400">
+                <div className="flex items-center">
+                  <Clock size={14} className="mr-1" />
+                  Posted {format(new Date(announcement.createdAt), 'dd MMM yyyy, hh:mm a')}
+                </div>
+                <div className="flex items-center bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded-md text-gray-600 dark:text-gray-300">
+                  <Eye size={14} className="mr-1.5" />
+                  <span className="font-semibold">{announcement.readCount || 0} views</span>
+                </div>
               </div>
             </motion.div>
           ))
@@ -171,7 +218,7 @@ const Announcements = () => {
               className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden"
             >
               <div className="p-6 border-b border-gray-100 dark:border-slate-700/50">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">New Announcement</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{editMode ? 'Edit Announcement' : 'New Announcement'}</h2>
               </div>
               
               <form onSubmit={handleSubmit} className="p-6">
@@ -199,6 +246,17 @@ const Announcements = () => {
                       <option value="High">High (Urgent)</option>
                     </select>
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Expiry Date (Optional)</label>
+                    <input 
+                      type="date" 
+                      min={new Date().toISOString().split('T')[0]}
+                      className="w-full p-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-gray-900 dark:text-white font-medium cursor-pointer"
+                      value={formData.expiresAt}
+                      onChange={e => setFormData({...formData, expiresAt: e.target.value})}
+                    />
+                  </div>
                   
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Message</label>
@@ -215,7 +273,7 @@ const Announcements = () => {
                 <div className="mt-8 flex gap-3">
                   <button 
                     type="button" 
-                    onClick={() => setShowModal(false)}
+                    onClick={handleCloseModal}
                     className="flex-1 py-2.5 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 font-medium rounded-xl hover:bg-gray-50 dark:bg-slate-900/50 transition-colors"
                   >
                     Cancel
@@ -224,7 +282,7 @@ const Announcements = () => {
                     type="submit" 
                     className="flex-1 py-2.5 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm"
                   >
-                    Post Announcement
+                    {editMode ? 'Save Changes' : 'Post Announcement'}
                   </button>
                 </div>
               </form>

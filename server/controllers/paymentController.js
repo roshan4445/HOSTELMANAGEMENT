@@ -57,7 +57,12 @@ exports.runRentGeneration = async (ownerId = null) => {
   const currentYear = now.getFullYear();
   const monthString = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
 
-  const tenantQuery = { status: 'Active' };
+  const tenantQuery = { 
+    $or: [
+      { moveOutDate: null },
+      { moveOutDate: { $gt: now } }
+    ]
+  };
   if (ownerId) tenantQuery.owner = ownerId;
   
   const activeTenants = await Tenant.find(tenantQuery).lean();

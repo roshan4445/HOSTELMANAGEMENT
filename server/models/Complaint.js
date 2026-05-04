@@ -12,6 +12,16 @@ const complaintSchema = new mongoose.Schema({
   priority: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Low' },
   sheetRowId: { type: String }, // To prevent duplicates
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
+  snapshot: {
+    name: { type: String },
+    roomNumber: { type: String },
+    phone: { type: String }
+  },
+  comments: [{
+    sender: { type: String, enum: ['tenant', 'owner'], required: true },
+    message: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+  }],
   image: { type: String }
 }, { timestamps: true });
 

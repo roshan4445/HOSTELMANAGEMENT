@@ -9,13 +9,50 @@ exports.getComplaints = async (req, res) => {
     if (req.user.role === 'tenant') {
       const tenant = await Tenant.findOne({ userAccount: req.user._id });
       if (!tenant) return res.status(404).json({ message: 'Tenant record not found' });
-      // Tenants see complaints they submitted.
       query = { tenantId: tenant._id };
     } else {
       query = { owner: req.user._id };
     }
-    const complaints = await Complaint.find(query).limit(1000).sort({ priority: -1, createdAt: -1 });
-    res.json(complaints);
+
+    // Backend Filtering
+    if (req.query.status) {
+      query.status = req.query.status;
+    }
+    if (req.query.category) {
+      query.category = req.query.category;
+    }
+
+    // Pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = Math.min(parseInt(req.query.limit) || 20, 50); // Max 50 per page
+    const skip = (page - 1) * limit;
+
+    const [rawComplaints, total] = await Promise.all([
+      Complaint.find(query)
+        .sort({ priority: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Complaint.countDocuments(query)
+    ]);
+
+    // Format response to ensure backward compatibility for old data vs new snapshot data
+    const complaints = rawComplaints.map(complaint => {
+      return {
+        ...complaint,
+        name: complaint.snapshot?.name || complaint.name,
+        roomNumber: complaint.snapshot?.roomNumber || complaint.roomNumber,
+        phone: complaint.snapshot?.phone || complaint.phone,
+        comments: complaint.comments || []
+      };
+    });
+
+    res.json({
+      complaints,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalCount: total
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -44,7 +81,14 @@ exports.createComplaint = async (req, res) => {
 
     const complaint = await Complaint.create({
       owner: ownerId,
-      tenantId, // we should add tenantId to Complaint model if not present, but mongoose is schemaless-ish or we can update model
+      tenantId,
+      // Store in new snapshot object
+      snapshot: {
+        name,
+        roomNumber,
+        phone
+      },
+      // Keep flat fields for strict legacy fallback (optional, but safest until full migration)
       name,
       roomNumber,
       phone,
@@ -52,7 +96,8 @@ exports.createComplaint = async (req, res) => {
       description,
       category: category || 'Other',
       priority: priority || 'Medium',
-      image // Assume we can add image field to model
+      image,
+      comments: []
     });
     
     try {
@@ -94,4 +139,55 @@ exports.updateComplaintStatus = async (req, res) => {
   }
 };
 
+exports.addComment = async (req, res) => {
+  try {
+    const { message } = req.body;
+    if (!message) {
+      return res.status(400).json({ message: 'Comment message is required' });
+    }
 
+    let query = { _id: req.params.id };
+    
+    // Security: Validate ownership
+    if (req.user.role === 'tenant') {
+      const tenant = await Tenant.findOne({ userAccount: req.user._id });
+      if (!tenant) return res.status(404).json({ message: 'Tenant record not found' });
+      query.tenantId = tenant._id;
+    } else {
+      query.owner = req.user._id;
+    }
+
+    const complaint = await Complaint.findOne(query);
+    if (!complaint) {
+      return res.status(404).json({ message: 'Complaint not found or unauthorized' });
+    }
+
+    // Append comment
+    const newComment = {
+      sender: req.user.role === 'owner' ? 'owner' : 'tenant',
+      message,
+      createdAt: new Date()
+    };
+    
+    if (!complaint.comments) {
+      complaint.comments = [];
+    }
+    complaint.comments.push(newComment);
+    
+    await complaint.save();
+
+    // Broadcast update
+    try {
+      getIO().to(`owner-${complaint.owner}`).emit('complaint-updated', complaint);
+      if (complaint.tenantId) {
+        getIO().to(`tenant-${complaint.tenantId}`).emit('complaint-updated', complaint);
+      }
+    } catch (err) {
+      console.error('Socket emission error:', err.message);
+    }
+
+    res.json(complaint);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

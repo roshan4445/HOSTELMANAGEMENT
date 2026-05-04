@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const Room = require('./models/Room');
-const Tenant = require('./models/Tenant');
-const Payment = require('./models/Payment');
-const Complaint = require('./models/Complaint');
-const Announcement = require('./models/Announcement');
-const User = require('./models/User');
+const Room = require('../models/Room');
+const Tenant = require('../models/Tenant');
+const Payment = require('../models/Payment');
+const Complaint = require('../models/Complaint');
+const Announcement = require('../models/Announcement');
+const AnnouncementRead = require('../models/AnnouncementRead');
+const Settings = require('../models/Settings');
+const User = require('../models/User');
 
 const randomEl = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -28,6 +30,8 @@ const seedDB = async () => {
     await Payment.deleteMany({});
     await Complaint.deleteMany({});
     await Announcement.deleteMany({});
+    await AnnouncementRead.deleteMany({});
+    await Settings.deleteMany({});
     console.log('Cleared old data');
 
     // Create 15 Rooms
@@ -78,8 +82,8 @@ const seedDB = async () => {
         room: room._id,
         rentAmount: room.rentAmount,
         deposit: room.rentAmount * 2,
-        status: 'Active',
-        paymentMethod: randomEl(['UPI', 'Cash'])
+        paymentMethod: randomEl(['UPI', 'Cash']),
+        aadhaarImage: '/uploads/dummy.png'
       });
       tenants.push(tenant);
       room.occupants.push(tenant._id);

@@ -5,17 +5,29 @@ exports.getRooms = async (req, res) => {
   try {
     const rooms = await Room.find({ owner: req.user._id }).limit(500).populate('occupants').lean();
     
-    // Compute the status manually since .lean() strips Mongoose virtuals
-    const roomsWithStatus = rooms.map(room => {
-      const occupantsCount = room.occupants ? room.occupants.length : 0;
+    // Compute the status and upcoming vacancy manually
+    const roomsWithData = rooms.map(room => {
+      const occupants = room.occupants || [];
+      const occupantsCount = occupants.length;
       let status = 'Vacant';
       if (occupantsCount > 0) {
         status = occupantsCount >= room.capacity ? 'Occupied' : 'Partial';
       }
-      return { ...room, status };
+
+      let upcomingVacancy = { isLeaving: false, availableFrom: null };
+      const vacatingTenants = occupants.filter(t => t.moveOutDate && new Date(t.moveOutDate) > new Date());
+      if (vacatingTenants.length > 0) {
+        vacatingTenants.sort((a, b) => new Date(a.moveOutDate) - new Date(b.moveOutDate));
+        upcomingVacancy = {
+          isLeaving: true,
+          availableFrom: vacatingTenants[0].moveOutDate
+        };
+      }
+
+      return { ...room, status, upcomingVacancy };
     });
 
-    res.json(roomsWithStatus);
+    res.json(roomsWithData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -48,21 +60,24 @@ exports.getPublicRooms = async (req, res) => {
     if (!owner) return res.status(404).json({ message: 'PG not found' });
 
     const rooms = await Room.find({ owner: owner._id }).limit(500)
-      .select('roomNumber type capacity floor rentAmount occupants upcomingVacancy')
+      .select('roomNumber type capacity floor rentAmount occupants')
       .populate('occupants').lean();
 
     const publicRooms = rooms.map(room => {
-      const isFull = room.occupants.length >= room.capacity;
+      const occupants = room.occupants || [];
+      const isFull = occupants.length >= room.capacity;
       let status = isFull ? 'Occupied' : 'Vacant';
       let availableFrom = null;
-
       let vacatingBedsCount = 0;
 
-      if (room.upcomingVacancy && room.upcomingVacancy.isLeaving) {
+      const vacatingTenants = occupants.filter(o => o.moveOutDate && new Date(o.moveOutDate) > new Date());
+      
+      if (vacatingTenants.length > 0) {
         status = 'Upcoming Vacancy';
-        availableFrom = room.upcomingVacancy.availableFrom;
-        vacatingBedsCount = room.occupants.filter(o => o.noticeGiven).length || 1;
-      } else if (!isFull && room.occupants.length > 0) {
+        vacatingTenants.sort((a, b) => new Date(a.moveOutDate) - new Date(b.moveOutDate));
+        availableFrom = vacatingTenants[0].moveOutDate;
+        vacatingBedsCount = vacatingTenants.length;
+      } else if (!isFull && occupants.length > 0) {
         status = 'Partial';
       }
 

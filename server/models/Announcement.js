@@ -18,6 +18,13 @@ const announcementSchema = new mongoose.Schema({
     type: String,
     enum: ['Low', 'Medium', 'High'],
     default: 'Low'
+  },
+  expiresAt: {
+    type: Date
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false
   }
 }, { timestamps: true });
 

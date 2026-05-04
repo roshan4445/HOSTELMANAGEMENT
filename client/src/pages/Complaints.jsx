@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ComplaintService from '../services/complaintService';
 import socket from '../socket';
-import { AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock, MessageSquare, Send } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -10,11 +10,13 @@ const Complaints = () => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('All');
+  const [filterCategory, setFilterCategory] = useState('All');
+  const [commentInputs, setCommentInputs] = useState({});
 
   const fetchComplaints = async () => {
     try {
       const data = await ComplaintService.getAll();
-      setComplaints(data);
+      setComplaints(data.complaints || data);
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -59,6 +61,16 @@ const Complaints = () => {
     }
   };
 
+  const handleComment = async (id) => {
+    if (!commentInputs[id] || !commentInputs[id].trim()) return;
+    try {
+      await ComplaintService.addComment(id, commentInputs[id]);
+      setCommentInputs(prev => ({ ...prev, [id]: '' }));
+    } catch (error) {
+      toast.error('Error sending comment');
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-8 animate-pulse">
@@ -71,7 +83,11 @@ const Complaints = () => {
     );
   }
 
-  const filteredComplaints = complaints.filter(c => filterStatus === 'All' || c.status === filterStatus);
+  const filteredComplaints = complaints.filter(c => {
+    const statusMatch = filterStatus === 'All' || c.status === filterStatus;
+    const categoryMatch = filterCategory === 'All' || c.category === filterCategory;
+    return statusMatch && categoryMatch;
+  });
 
   return (
     <motion.div
@@ -86,16 +102,29 @@ const Complaints = () => {
           <p className="text-gray-500 dark:text-gray-400 mt-1">Manage tenant maintenance requests synced from Google Forms.</p>
         </div>
         
-        <select 
-          className="p-2.5 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 rounded-xl bg-white dark:bg-slate-800 shadow-sm outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer w-full sm:w-auto"
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-        >
-          <option value="All">All Status</option>
-          <option value="Pending">Pending</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Resolved">Resolved</option>
-        </select>
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <select 
+            className="p-2.5 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 rounded-xl bg-white dark:bg-slate-800 shadow-sm outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer"
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+          >
+            <option value="All">All Categories</option>
+            <option value="Plumbing">Plumbing</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Cleaning">Cleaning</option>
+            <option value="Other">Other</option>
+          </select>
+          <select 
+            className="p-2.5 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 rounded-xl bg-white dark:bg-slate-800 shadow-sm outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="All">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
       </div>
 
       <motion.div 
@@ -147,7 +176,7 @@ const Complaints = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 mt-4 lg:mt-0">
                     <motion.select
                       whileTap={{ scale: 0.97 }}
                       className={`p-2 rounded-xl text-sm font-semibold border shadow-sm outline-none cursor-pointer transition-all ${
@@ -163,6 +192,53 @@ const Complaints = () => {
                     </motion.select>
                   </div>
                 </div>
+
+                {/* Comments Section */}
+                <div className="mt-5 border-t border-gray-100 dark:border-slate-700/50 pt-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <MessageSquare size={16} className="text-gray-400" />
+                    <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300">Internal Chat</h4>
+                  </div>
+                  
+                  <div className="space-y-3 mb-4 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                    {(!complaint.comments || complaint.comments.length === 0) ? (
+                      <p className="text-xs text-gray-400 italic">No comments yet. Start the conversation...</p>
+                    ) : (
+                      complaint.comments.map((comment, idx) => (
+                        <div key={idx} className={`flex flex-col ${comment.sender === 'owner' ? 'items-end' : 'items-start'}`}>
+                          <div className={`px-3 py-2 rounded-2xl max-w-[80%] text-sm ${
+                            comment.sender === 'owner' 
+                            ? 'bg-indigo-600 text-white rounded-br-none' 
+                            : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-100 rounded-bl-none'
+                          }`}>
+                            <p>{comment.message}</p>
+                          </div>
+                          <span className="text-[10px] text-gray-400 mt-1 mx-1">
+                            {comment.sender === 'owner' ? 'You' : complaint.name} • {format(new Date(comment.createdAt), 'hh:mm a, MMM dd')}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      className="flex-1 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      placeholder="Type an update or reply..."
+                      value={commentInputs[complaint._id] || ''}
+                      onChange={(e) => setCommentInputs(prev => ({...prev, [complaint._id]: e.target.value}))}
+                      onKeyDown={(e) => { if(e.key === 'Enter') handleComment(complaint._id) }}
+                    />
+                    <button 
+                      onClick={() => handleComment(complaint._id)}
+                      className="p-2 bg-indigo-600 text-white rounded-xl shadow-sm hover:bg-indigo-700 transition-colors"
+                    >
+                      <Send size={18} />
+                    </button>
+                  </div>
+                </div>
+
               </motion.div>
             ))}
           </motion.div>

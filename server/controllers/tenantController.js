@@ -10,7 +10,19 @@ const Settings = require('../models/Settings');
 exports.getTenants = async (req, res) => {
   try {
     const tenants = await Tenant.find({ owner: req.user._id }).limit(1000).populate('room').lean();
-    res.json(tenants);
+    const tenantsWithVirtuals = tenants.map(t => {
+      const isMovedOut = t.moveOutDate && new Date(t.moveOutDate) <= new Date();
+      const status = isMovedOut ? 'MovedOut' : 'Active';
+      const noticeGiven = t.moveOutDate && new Date(t.moveOutDate) > new Date();
+      
+      let maskedAadhaar = t.aadhaar;
+      if (maskedAadhaar && maskedAadhaar.length >= 4) {
+        maskedAadhaar = `XXXX-XXXX-${maskedAadhaar.slice(-4)}`;
+      }
+
+      return { ...t, status, noticeGiven, aadhaar: maskedAadhaar };
+    });
+    res.json(tenantsWithVirtuals);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -38,28 +50,8 @@ exports.createTenant = async (req, res) => {
       return res.status(400).json({ message: 'Move-in date must be within 10 days of the present date.' });
     }
 
-    // Check for duplicate active tenant
-    const orConditions = [{ phone }];
-    if (email) orConditions.push({ email });
-    orConditions.push({ name: new RegExp(`^${name}$`, 'i') });
-
-    const duplicateTenant = await Tenant.findOne({
-      owner: req.user._id,
-      status: 'Active',
-      $or: orConditions
-    });
-
-    if (duplicateTenant) {
-      if (duplicateTenant.phone === phone) {
-        return res.status(400).json({ message: 'An active tenant with this phone number already exists in your PG.' });
-      }
-      if (email && duplicateTenant.email === email) {
-        return res.status(400).json({ message: 'An active tenant with this email already exists in your PG.' });
-      }
-      if (duplicateTenant.name.toLowerCase() === name.toLowerCase()) {
-        return res.status(400).json({ message: 'An active tenant with this exact full name already exists in your PG.' });
-      }
-    }
+    // Removed manual duplicate check because we added a DB-level unique constraint
+    // { owner: 1, phone: 1 } which will throw a MongoDB E11000 error.
 
     const actualRentAmount = room.rentAmount;
 
@@ -107,8 +99,15 @@ exports.createTenant = async (req, res) => {
       // We do not fail the tenant creation if user creation fails
     }
 
-    res.status(201).json(tenant);
+    const createdTenant = tenant.toObject({ virtuals: true });
+    if (createdTenant.aadhaar && createdTenant.aadhaar.length >= 4) {
+      createdTenant.aadhaar = `XXXX-XXXX-${createdTenant.aadhaar.slice(-4)}`;
+    }
+    res.status(201).json(createdTenant);
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'A tenant with this phone number already exists in your PG.' });
+    }
     res.status(500).json({ message: error.message });
   }
 };
@@ -117,9 +116,9 @@ exports.moveOutTenant = async (req, res) => {
   try {
     const tenant = await Tenant.findOne({ _id: req.params.id, owner: req.user._id });
     if (!tenant) return res.status(404).json({ message: 'Tenant not found' });
-    if (tenant.status === 'MovedOut') return res.status(400).json({ message: 'Tenant already moved out' });
+    const isMovedOut = tenant.moveOutDate && new Date(tenant.moveOutDate) <= new Date();
+    if (isMovedOut) return res.status(400).json({ message: 'Tenant already moved out' });
 
-    tenant.status = 'MovedOut';
     tenant.moveOutDate = new Date();
     await tenant.save();
 
@@ -127,13 +126,12 @@ exports.moveOutTenant = async (req, res) => {
       const room = await Room.findById(tenant.room);
       if (room) {
         room.occupants = room.occupants.filter(occ => occ.toString() !== tenant._id.toString());
-        // Clear upcoming vacancy if it was set
-        room.upcomingVacancy = { isLeaving: false, availableFrom: null };
         await room.save();
       }
     }
 
-    res.json({ message: 'Tenant moved out successfully', tenant });
+    const updatedTenant = tenant.toObject({ virtuals: true });
+    res.json({ message: 'Tenant moved out successfully', tenant: updatedTenant });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -152,7 +150,8 @@ exports.giveNotice = async (req, res) => {
       tenant = await Tenant.findOne({ _id: req.params.id, owner: req.user._id });
     }
     if (!tenant) return res.status(404).json({ message: 'Tenant not found' });
-    if (tenant.status === 'MovedOut') return res.status(400).json({ message: 'Tenant already moved out' });
+    const isMovedOut = tenant.moveOutDate && new Date(tenant.moveOutDate) <= new Date();
+    if (isMovedOut) return res.status(400).json({ message: 'Tenant already moved out' });
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -172,23 +171,13 @@ exports.giveNotice = async (req, res) => {
       return res.status(400).json({ message: `Notice period must be at least ${noticePeriodDays} days from today.` });
     }
 
-    tenant.noticeGiven = true;
-    tenant.noticeDate = new Date();
     tenant.moveOutDate = plannedMoveOut;
     await tenant.save();
 
-    if (tenant.room) {
-      const room = await Room.findById(tenant.room);
-      if (room) {
-        room.upcomingVacancy = {
-          isLeaving: true,
-          availableFrom: plannedMoveOut
-        };
-        await room.save();
-      }
-    }
+    // Room vacancy is now computed dynamically when fetching rooms, no need to update Room model here.
 
-    res.json({ message: 'Notice submitted successfully', tenant });
+    const updatedTenant = tenant.toObject({ virtuals: true });
+    res.json({ message: 'Notice submitted successfully', tenant: updatedTenant });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

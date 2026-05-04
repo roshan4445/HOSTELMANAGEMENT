@@ -10,17 +10,32 @@ const tenantSchema = new mongoose.Schema({
   aadhaarImage: { type: String, required: true, select: false },
   moveInDate: { type: Date, required: true },
   moveOutDate: { type: Date },
-  noticeGiven: { type: Boolean, default: false },
   noticeDate: { type: Date },
   room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' },
   paymentMethod: { type: String, enum: ['UPI', 'Cash'], default: 'UPI' },
-  status: { type: String, enum: ['Active', 'MovedOut'], default: 'Active' },
   rentAmount: { type: Number, required: true },
   deposit: { type: Number, default: 0 }
-}, { timestamps: true });
+}, { 
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
 
-// Performance indexes
-tenantSchema.index({ owner: 1, status: 1 });
+// Dynamic derived fields (Single Source of Truth)
+tenantSchema.virtual('status').get(function() {
+  if (!this.moveOutDate || this.moveOutDate > new Date()) {
+    return 'Active';
+  }
+  return 'MovedOut';
+});
+
+tenantSchema.virtual('noticeGiven').get(function() {
+  return this.moveOutDate && this.moveOutDate > new Date();
+});
+
+// Performance and constraint indexes
+// Prevent duplicate tenants per owner
+tenantSchema.index({ owner: 1, phone: 1 }, { unique: true });
 tenantSchema.index({ userAccount: 1 });
 
 module.exports = mongoose.model('Tenant', tenantSchema);

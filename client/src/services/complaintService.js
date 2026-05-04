@@ -14,6 +14,11 @@ const ComplaintService = {
   updateStatus: async (id, status) => {
     const { data } = await API.put(`/api/complaints/${id}`, { status });
     return data;
+  },
+
+  addComment: async (id, message) => {
+    const { data } = await API.post(`/api/complaints/${id}/comment`, { message });
+    return data;
   }
 };
 

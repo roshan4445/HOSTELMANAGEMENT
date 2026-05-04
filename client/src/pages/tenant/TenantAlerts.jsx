@@ -21,7 +21,15 @@ const TenantAlerts = () => {
     const fetchAnnouncements = async () => {
       try {
         const data = await AnnouncementService.getAll();
-        setAnnouncements(data);
+        const fetchedAnns = data.announcements || data;
+        setAnnouncements(fetchedAnns);
+        
+        // Background task: mark unread as read
+        fetchedAnns.forEach(ann => {
+          if (ann.isRead === false) {
+            AnnouncementService.markAsRead(ann._id).catch(err => console.error(err));
+          }
+        });
       } catch (error) {
         console.error(error);
       } finally {
@@ -39,13 +47,23 @@ const TenantAlerts = () => {
       }
 
       socket.on('announcement-new', (newAnn) => {
-        setAnnouncements(prev => [newAnn, ...prev]);
+        // Assume unread when it arrives live
+        const annWithRead = { ...newAnn, isRead: false };
+        setAnnouncements(prev => [annWithRead, ...prev]);
         toast.success(`New Announcement: ${newAnn.title}`, { icon: '📣' });
+        
+        // Mark as read immediately since they are on the page
+        AnnouncementService.markAsRead(newAnn._id).catch(() => {});
+      });
+
+      socket.on('announcement-updated', (updatedAnn) => {
+        setAnnouncements(prev => prev.map(a => a._id === updatedAnn._id ? { ...a, ...updatedAnn } : a));
       });
     }
 
     return () => {
       socket.off('announcement-new');
+      socket.off('announcement-updated');
     };
   }, []);
 
@@ -94,7 +112,14 @@ const TenantAlerts = () => {
               ann.priority === 'Medium' ? 'border-l-yellow-500' : 'border-l-indigo-500'
             }`}>
               <div className="flex justify-between items-start mb-2">
-                <h3 className="font-bold text-gray-800 dark:text-gray-100">{ann.title}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-gray-800 dark:text-gray-100">{ann.title}</h3>
+                  {ann.isRead === false && (
+                    <span className="bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
+                      NEW
+                    </span>
+                  )}
+                </div>
                 <span className="text-[10px] text-gray-400 font-bold whitespace-nowrap">
                   {new Date(ann.createdAt).toLocaleDateString()}
                 </span>
