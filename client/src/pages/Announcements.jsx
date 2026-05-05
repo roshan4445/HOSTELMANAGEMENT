@@ -4,6 +4,7 @@ import { Megaphone, Plus, Trash2, Clock, MessageCircle, Edit2, Eye, CalendarX2 }
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 const Announcements = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -36,19 +37,44 @@ const Announcements = () => {
       if (!payload.expiresAt) delete payload.expiresAt;
 
       if (editMode) {
+        // Edit mode - no webhook needed ✅
         await AnnouncementService.update(editId, payload);
         toast.success('Announcement updated successfully!');
       } else {
+        // Create new announcement ✅
         await AnnouncementService.create(payload);
+
+        // Webhook call ✅
+        try {
+          await axios.post(
+            'https://proconscription-rifely-tiffaney.ngrok-free.dev/webhook/announcements',
+            {
+              title: formData.title,
+              message: formData.message,
+              priority: formData.priority
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+              }
+            }
+          );
+          console.log('Webhook triggered! ✅');
+        } catch (webhookError) {
+          console.log('Webhook error:', webhookError);
+        }
+
         toast.success('Announcement posted successfully!');
       }
       
       handleCloseModal();
       fetchAnnouncements();
+
     } catch (error) {
       toast.error(error.response?.data?.message || 'Error saving announcement');
     }
-  };
+};
 
   const handleOpenEdit = (ann) => {
     setEditMode(true);
