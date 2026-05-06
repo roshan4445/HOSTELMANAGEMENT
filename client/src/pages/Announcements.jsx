@@ -47,7 +47,7 @@ const Announcements = () => {
         // Webhook call ✅
         try {
           await axios.post(
-            'https://proconscription-rifely-tiffaney.ngrok-free.dev/webhook/announcements',
+            'https://proconscription-rifely-tiffaney.ngrok-free.dev/webhook-test/announcements',
             {
               title: formData.title,
               message: formData.message,
